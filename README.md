@@ -1,2 +1,1 @@
-# steam-auth
-New steam auth
+# it's not ready for production
