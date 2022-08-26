@@ -225,32 +225,46 @@ class SteamAuth:
 
     async def update_auth_session(
             self,
-            request: CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request
+            client_id: int,
+            steamid: int,
+            code: str,
+            code_type: int,
     ) -> None:
         """
         Update session request.
         """
+        message = CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
+            client_id=client_id,
+            steamid=steamid,
+            code=code,
+            code_type=code_type,
+        )
         await self.session.post(
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithSteamGuardCode/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(request.SerializeToString()), 'utf8'))
+                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
                 ]
             ),
         )
 
     async def poll_auth_session_status(
             self,
-            request: CAuthentication_PollAuthSessionStatus_Request,
+            client_id: int,
+            request_id: bytes,
     ) -> CAuthentication_PollAuthSessionStatus_Response:
         """
         Auth session status.
         """
+        message = CAuthentication_PollAuthSessionStatus_Request(
+            client_id=client_id,
+            request_id=request_id,
+        )
         response = await self.session.post(
             url='https://api.steampowered.com/IAuthenticationService/PollAuthSessionStatus/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(request.SerializeToString()), 'utf8'))
+                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
                 ]
             ),
         )
@@ -309,19 +323,15 @@ class SteamAuth:
         if auth_session.allowed_confirmations:
             if auth_session.allowed_confirmations[0].confirmation_type == k_EAuthSessionGuardType_DeviceCode:
                 code = await self.get_steam_guard()
-                update_session_request = CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
+                await self.update_auth_session(
                     client_id=auth_session.client_id,
                     steamid=auth_session.steamid,
                     code=code,
                     code_type=k_EAuthSessionGuardType_DeviceCode,
                 )
-                await self.update_auth_session(update_session_request)
-        auth_session_status_request = CAuthentication_PollAuthSessionStatus_Request(
+        auth_session_status = await self.poll_auth_session_status(
             client_id=auth_session.client_id,
             request_id=auth_session.request_id,
-        )
-        auth_session_status = await self.poll_auth_session_status(
-            request=auth_session_status_request,
         )
         cookies = {}
         transfer_info_response = await self.finalize_login(

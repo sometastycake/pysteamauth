@@ -41,9 +41,9 @@ class RedisStorage(CookieStorage):
     async def get(self, login: str, domain='steamcommunity.com') -> Dict[str, Any]:
         if self.cache.get(login):
             cookies = self.cache.get(login, {})
-            return cookies[domain]
+            return cookies.get(domain, {})
         cookies = await self.redis.get_json(login, default={})
         self.cache.update({
             login: cookies,
         })
-        return cookies[domain]
+        return cookies.get(domain, {})
