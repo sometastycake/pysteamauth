@@ -29,20 +29,6 @@ from .schemas import (
 )
 
 
-# from pb2.enums_pb2 import k_ESessionPersistence_Persistent
-# from pb2.steammessages_auth.steamclient_pb2 import (
-#     CAuthentication_BeginAuthSessionViaCredentials_Request,
-#     CAuthentication_BeginAuthSessionViaCredentials_Response,
-#     CAuthentication_GetPasswordRSAPublicKey_Request,
-#     CAuthentication_GetPasswordRSAPublicKey_Response,
-#     CAuthentication_PollAuthSessionStatus_Request,
-#     CAuthentication_PollAuthSessionStatus_Response,
-#     CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
-#     k_EAuthSessionGuardType_DeviceCode,
-#     k_EAuthTokenPlatformType_WebBrowser,
-# )
-
-
 CookieStorageType = TypeVar('CookieStorageType', bound=abstract.CookieStorageAbstract)
 RequestStrategyType = TypeVar('RequestStrategyType', bound=abstract.RequestStrategyAbstract)
 
