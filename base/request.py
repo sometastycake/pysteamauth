@@ -12,6 +12,7 @@ from aiohttp import (
 )
 
 from abstract.request import RequestStrategyAbstract
+from errors.response import check_steam_error
 
 
 class BaseRequestStrategy(RequestStrategyAbstract):
@@ -45,10 +46,16 @@ class BaseRequestStrategy(RequestStrategyAbstract):
 
     async def request(self, url: str, method: str, in_bytes: bool = False, **kwargs: Any) -> Union[str, bytes]:
         response = await self._request(url, method, **kwargs)
+        error = response.headers.get('X-eresult')
+        if error:
+            check_steam_error(int(error))
         if in_bytes:
             return await response.content.read()
         return await response.text()
 
     async def get_cookies(self, url: str, method: str, **kwargs: Any) -> Dict[str, str]:
         response = await self._request(url, method, **kwargs)
+        error = response.headers.get('X-eresult')
+        if error:
+            check_steam_error(int(error))
         return {k: v.value for k, v in response.cookies.items()}
