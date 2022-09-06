@@ -15,9 +15,9 @@ from google.protobuf.internal import enum_type_wrapper
 _sym_db = _symbol_database.Default()
 
 
-import pb2_schemas.enums_pb2 as enums__pb2  # noqa
-import pb2_schemas.steammessages_base_pb2 as steammessages__base__pb2  # noqa
-import pb2_schemas.steammessages_unified_base.steamclient_pb2 as steammessages__unified__base_dot_steamclient__pb2  # noqa
+import pb2.enums_pb2 as enums__pb2  # noqa
+import pb2.steammessages_base_pb2 as steammessages__base__pb2  # noqa
+import pb2.steammessages_unified_base.steamclient_pb2 as steammessages__unified__base_dot_steamclient__pb2  # noqa
 
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(

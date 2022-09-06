@@ -2,32 +2,31 @@ import base64
 import binascii
 import hashlib
 import hmac
+import json
 import math
 from struct import pack
 from typing import (
     Any,
-    Dict,
     Optional,
     Type,
     TypeVar,
 )
 
-import aiohttp
 import rsa
 from aiohttp import FormData
 from yarl import URL
 
+from abstract.request import RequestStrategyAbstract
+from abstract.storage import CookieStorageAbstract
 from auth.exceptions import LoginError
 from auth.schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
 )
-from auth.storage import (
-    CookieStorage,
-    RedisStorage,
-)
-from pb2_schemas.enums_pb2 import k_ESessionPersistence_Persistent
-from pb2_schemas.steammessages_auth.steamclient_pb2 import (
+from base.request import BaseRequestStrategy
+from base.storage import BaseCookieStorage
+from pb2.enums_pb2 import k_ESessionPersistence_Persistent
+from pb2.steammessages_auth.steamclient_pb2 import (
     CAuthentication_BeginAuthSessionViaCredentials_Request,
     CAuthentication_BeginAuthSessionViaCredentials_Response,
     CAuthentication_GetPasswordRSAPublicKey_Request,
@@ -40,10 +39,11 @@ from pb2_schemas.steammessages_auth.steamclient_pb2 import (
 )
 
 
-StorageType = TypeVar('StorageType', bound=CookieStorage)
+CookieStorageType = TypeVar('CookieStorageType', bound=CookieStorageAbstract)
+RequestStrategyType = TypeVar('RequestStrategyType', bound=RequestStrategyAbstract)
 
 
-class SteamAuth:
+class Steam:
 
     steam_guard_codes = [
         50, 51, 52, 53, 54, 55, 56, 57, 66, 67, 68, 70, 71,
@@ -54,70 +54,49 @@ class SteamAuth:
         self,
         login: str,
         password: str,
-        authenticator: AuthenticatorData,
-        storage: Type[StorageType] = RedisStorage,
+        authenticator: Optional[AuthenticatorData] = None,
+        cookie_storage: Type[CookieStorageType] = BaseCookieStorage,
+        request_strategy: Type[RequestStrategyAbstract] = BaseRequestStrategy,
     ):
-        self._session: Optional[aiohttp.ClientSession] = None
         self.login = login
         self.password = password
         self.authenticator = authenticator
-        self.storage = storage()
+        self._http = request_strategy()
+        self._storage = cookie_storage()
 
-    @property
-    def session(self) -> aiohttp.ClientSession:
-        if self._session is None:
-            self._session = aiohttp.ClientSession(
-                connector=aiohttp.TCPConnector(ssl=False),
-                raise_for_status=True,
-                cookie_jar=aiohttp.DummyCookieJar(),
-            )
-        return self._session
-
-    def __del__(self):
-        if self._session:
-            self._session.connector.close()
-
-    async def request(
-        self,
-        url: str,
-        method: str = 'GET',
-        cookie_domain: str = 'steamcommunity.com',
-        is_json: bool = False,
-        **kwargs: Any
-    ) -> Any:
+    async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         """
         Request with Steam session.
-        Cookie domain may be (store.steampowered.com | help.steampowered.com | steamcommunity.com).
         """
-        cookies = await self.storage.get(self.login, cookie_domain)
-        response = await self.session.request(
+        return await self._http.request(
             url=url,
             method=method,
-            cookies=cookies,
+            cookies=await self._storage.get(
+                login=self.login,
+                domain=URL(url).host.replace('www.', '')
+            ),
             **kwargs,
         )
-        if is_json:
-            return await response.json()
-        return await response.text()
 
     async def is_authorized(self) -> bool:
         """
         Is alive authorization.
         """
-        response: Dict = await self.request(
+        response: str = await self.request(
+            method='GET',
             url='https://steamcommunity.com/chat/clientjstoken',
-            is_json=True
         )
-        return response['logged_in']
+        return json.loads(response)['logged_in']
 
     async def get_sessionid_from_steam(self) -> str:
         """
         Get sessionid cookie.
         """
-        response = await self.session.get(
+        cookies = await self._http.get_cookies(
+            method='GET',
             url='https://steamcommunity.com',
         )
-        return response.cookies.get('sessionid').value
+        return cookies['sessionid']
 
     async def getrsakey(self) -> CAuthentication_GetPasswordRSAPublicKey_Response:
         """
@@ -126,14 +105,15 @@ class SteamAuth:
         message = CAuthentication_GetPasswordRSAPublicKey_Request(
             account_name=self.login,
         )
-        response = await self.session.get(
+        response = await self._http.request(
+            method='GET',
             url='https://api.steampowered.com/IAuthenticationService/GetPasswordRSAPublicKey/v1',
             params={
                 'input_protobuf_encoded': str(base64.b64encode(message.SerializeToString()), 'utf8'),
             },
+            in_bytes=True,
         )
-        data = await response.content.read()
-        return CAuthentication_GetPasswordRSAPublicKey_Response.FromString(data)
+        return CAuthentication_GetPasswordRSAPublicKey_Response.FromString(response)
 
     async def begin_auth_session(
             self,
@@ -143,10 +123,6 @@ class SteamAuth:
         """
         Begin auth session.
         """
-        user_agent = (
-            'Mozilla/5.0 (Linux; Android 2.3) AppleWebKit/535.2 '
-            '(KHTML, like Gecko) Chrome/20.0.850.0 Safari/535.2'
-        )
         message = CAuthentication_BeginAuthSessionViaCredentials_Request(
             account_name=self.login,
             encrypted_password=encrypted_password,
@@ -155,27 +131,29 @@ class SteamAuth:
             platform_type=k_EAuthTokenPlatformType_WebBrowser,
             website_id='Community',
             persistence=k_ESessionPersistence_Persistent,
-            device_friendly_name=user_agent,
+            device_friendly_name='Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8',
         )
-        response = await self.session.post(
+        response = await self._http.request(
+            method='POST',
             url='https://api.steampowered.com/IAuthenticationService/BeginAuthSessionViaCredentials/v1',
             data=FormData(
                 fields=[
                     ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
                 ]
             ),
+            in_bytes=True,
         )
-        data = await response.content.read()
-        return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(data)
+        return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
 
     async def get_server_time(self) -> int:
         """
         Get server time.
         """
-        response = await self.session.post(
+        response = await self._http.request(
+            method='POST',
             url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
         )
-        data = await response.json()
+        data = json.loads(response)
         return int(data['response']['server_time'])
 
     async def get_steam_guard(self) -> str:
@@ -239,7 +217,8 @@ class SteamAuth:
             code=code,
             code_type=code_type,
         )
-        await self.session.post(
+        await self._http.request(
+            method='POST',
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithSteamGuardCode/v1',
             data=FormData(
                 fields=[
@@ -260,22 +239,24 @@ class SteamAuth:
             client_id=client_id,
             request_id=request_id,
         )
-        response = await self.session.post(
+        response = await self._http.request(
+            method='POST',
             url='https://api.steampowered.com/IAuthenticationService/PollAuthSessionStatus/v1',
             data=FormData(
                 fields=[
                     ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
                 ]
             ),
+            in_bytes=True,
         )
-        data = await response.content.read()
-        return CAuthentication_PollAuthSessionStatus_Response.FromString(data)
+        return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
     async def finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
         """
         Finalize login.
         """
-        response = await self.session.post(
+        response = await self._http.request(
+            method='POST',
             url='https://login.steampowered.com/jwt/finalizelogin',
             data=FormData(
                 fields=[
@@ -285,7 +266,7 @@ class SteamAuth:
                 ],
             ),
         )
-        return FinalizeLoginStatus.parse_raw(await response.text())
+        return FinalizeLoginStatus.parse_raw(response)
 
     async def set_token(self, url: str, nonce: str, auth: str, steamid: int) -> str:
         """
@@ -293,7 +274,8 @@ class SteamAuth:
 
         :return: SteamLoginSecure cookie value.
         """
-        response = await self.session.post(
+        cookies = await self._http.get_cookies(
+            method='POST',
             url=url,
             data=FormData(
                 fields=[
@@ -303,7 +285,7 @@ class SteamAuth:
                 ],
             ),
         )
-        return response.cookies.get('steamLoginSecure').value
+        return cookies['steamLoginSecure']
 
     async def login_to_steam(self) -> None:
         """
@@ -351,4 +333,4 @@ class SteamAuth:
                 'steamLoginSecure': steam_login_secure,
                 'Steam_Language': 'english',
             }
-        await self.storage.set(login=self.login, cookies=cookies)
+        await self._storage.set(login=self.login, cookies=cookies)
