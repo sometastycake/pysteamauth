@@ -1,6 +1,6 @@
 from typing import Optional
 
-from errors.codes import STEAM_ERROR_CODES
+from .codes import STEAM_ERROR_CODES
 
 
 class SteamError(Exception):

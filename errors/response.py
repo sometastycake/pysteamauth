@@ -1,5 +1,5 @@
-from errors.codes import STEAM_ERROR_CODES
-from errors.exceptions import (
+from .codes import STEAM_ERROR_CODES
+from .exceptions import (
     SteamError,
     UnknownSteamError,
 )

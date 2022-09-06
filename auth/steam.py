@@ -16,32 +16,35 @@ import rsa
 from aiohttp import FormData
 from yarl import URL
 
-from abstract.request import RequestStrategyAbstract
-from abstract.storage import CookieStorageAbstract
-from auth.exceptions import LoginError
-from auth.schemas import (
+from .. import (
+    abstract,
+    base,
+    pb2,
+)
+from .exceptions import LoginError
+from .schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
     ServerTimeResponse,
 )
-from base.request import BaseRequestStrategy
-from base.storage import BaseCookieStorage
-from pb2.enums_pb2 import k_ESessionPersistence_Persistent
-from pb2.steammessages_auth.steamclient_pb2 import (
-    CAuthentication_BeginAuthSessionViaCredentials_Request,
-    CAuthentication_BeginAuthSessionViaCredentials_Response,
-    CAuthentication_GetPasswordRSAPublicKey_Request,
-    CAuthentication_GetPasswordRSAPublicKey_Response,
-    CAuthentication_PollAuthSessionStatus_Request,
-    CAuthentication_PollAuthSessionStatus_Response,
-    CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
-    k_EAuthSessionGuardType_DeviceCode,
-    k_EAuthTokenPlatformType_WebBrowser,
-)
 
 
-CookieStorageType = TypeVar('CookieStorageType', bound=CookieStorageAbstract)
-RequestStrategyType = TypeVar('RequestStrategyType', bound=RequestStrategyAbstract)
+# from pb2.enums_pb2 import k_ESessionPersistence_Persistent
+# from pb2.steammessages_auth.steamclient_pb2 import (
+#     CAuthentication_BeginAuthSessionViaCredentials_Request,
+#     CAuthentication_BeginAuthSessionViaCredentials_Response,
+#     CAuthentication_GetPasswordRSAPublicKey_Request,
+#     CAuthentication_GetPasswordRSAPublicKey_Response,
+#     CAuthentication_PollAuthSessionStatus_Request,
+#     CAuthentication_PollAuthSessionStatus_Response,
+#     CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
+#     k_EAuthSessionGuardType_DeviceCode,
+#     k_EAuthTokenPlatformType_WebBrowser,
+# )
+
+
+CookieStorageType = TypeVar('CookieStorageType', bound=abstract.CookieStorageAbstract)
+RequestStrategyType = TypeVar('RequestStrategyType', bound=abstract.RequestStrategyAbstract)
 
 
 class Steam:
@@ -51,8 +54,8 @@ class Steam:
         login: str,
         password: str,
         authenticator: Optional[AuthenticatorData] = None,
-        cookie_storage: Type[CookieStorageType] = BaseCookieStorage,
-        request_strategy: Type[RequestStrategyAbstract] = BaseRequestStrategy,
+        cookie_storage: Type[CookieStorageType] = base.BaseCookieStorage,
+        request_strategy: Type[RequestStrategyType] = base.BaseRequestStrategy,
     ):
         self.login = login
         self.password = password
@@ -94,11 +97,11 @@ class Steam:
         )
         return cookies['sessionid']
 
-    async def getrsakey(self) -> CAuthentication_GetPasswordRSAPublicKey_Response:
+    async def getrsakey(self) -> pb2.CAuthentication_GetPasswordRSAPublicKey_Response:
         """
         Get rsa keys for password encryption.
         """
-        message = CAuthentication_GetPasswordRSAPublicKey_Request(
+        message = pb2.CAuthentication_GetPasswordRSAPublicKey_Request(
             account_name=self.login,
         )
         response = await self._http.request(
@@ -109,24 +112,24 @@ class Steam:
             },
             in_bytes=True,
         )
-        return CAuthentication_GetPasswordRSAPublicKey_Response.FromString(response)
+        return pb2.CAuthentication_GetPasswordRSAPublicKey_Response.FromString(response)
 
     async def begin_auth_session(
             self,
             encrypted_password: str,
             rsa_timestamp: int,
-    ) -> CAuthentication_BeginAuthSessionViaCredentials_Response:
+    ) -> pb2.CAuthentication_BeginAuthSessionViaCredentials_Response:
         """
         Begin auth session.
         """
-        message = CAuthentication_BeginAuthSessionViaCredentials_Request(
+        message = pb2.CAuthentication_BeginAuthSessionViaCredentials_Request(
             account_name=self.login,
             encrypted_password=encrypted_password,
             encryption_timestamp=rsa_timestamp,
             remember_login=True,
-            platform_type=k_EAuthTokenPlatformType_WebBrowser,
+            platform_type=pb2.k_EAuthTokenPlatformType_WebBrowser,
             website_id='Community',
-            persistence=k_ESessionPersistence_Persistent,
+            persistence=pb2.k_ESessionPersistence_Persistent,
             device_friendly_name='Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8',
         )
         response = await self._http.request(
@@ -139,7 +142,7 @@ class Steam:
             ),
             in_bytes=True,
         )
-        return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
+        return pb2.CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
 
     async def get_server_time(self) -> int:
         """
@@ -181,7 +184,7 @@ class Steam:
 
         return code
 
-    def encrypt_password(self, keys: CAuthentication_GetPasswordRSAPublicKey_Response) -> str:
+    def encrypt_password(self, keys: pb2.CAuthentication_GetPasswordRSAPublicKey_Response) -> str:
         """
         Encrypt password.
         """
@@ -207,7 +210,7 @@ class Steam:
         """
         Update session request.
         """
-        message = CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
+        message = pb2.CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
             client_id=client_id,
             steamid=steamid,
             code=code,
@@ -227,11 +230,11 @@ class Steam:
             self,
             client_id: int,
             request_id: bytes,
-    ) -> CAuthentication_PollAuthSessionStatus_Response:
+    ) -> pb2.CAuthentication_PollAuthSessionStatus_Response:
         """
         Auth session status.
         """
-        message = CAuthentication_PollAuthSessionStatus_Request(
+        message = pb2.CAuthentication_PollAuthSessionStatus_Request(
             client_id=client_id,
             request_id=request_id,
         )
@@ -245,7 +248,7 @@ class Steam:
             ),
             in_bytes=True,
         )
-        return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
+        return pb2.CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
     async def finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
         """
@@ -299,13 +302,13 @@ class Steam:
         if not auth_session.steamid:
             raise LoginError(f'Login error "{self.login}"')
         if auth_session.allowed_confirmations:
-            if auth_session.allowed_confirmations[0].confirmation_type == k_EAuthSessionGuardType_DeviceCode:
+            if auth_session.allowed_confirmations[0].confirmation_type == pb2.k_EAuthSessionGuardType_DeviceCode:
                 code = await self.get_steam_guard()
                 await self.update_auth_session(
                     client_id=auth_session.client_id,
                     steamid=auth_session.steamid,
                     code=code,
-                    code_type=k_EAuthSessionGuardType_DeviceCode,
+                    code_type=pb2.k_EAuthSessionGuardType_DeviceCode,
                 )
         auth_session_status = await self.poll_auth_session_status(
             client_id=auth_session.client_id,

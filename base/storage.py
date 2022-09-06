@@ -1,9 +1,9 @@
 from typing import Dict
 
-from abstract.storage import CookieStorageAbstract
+from .. import abstract
 
 
-class BaseCookieStorage(CookieStorageAbstract):
+class BaseCookieStorage(abstract.CookieStorageAbstract):
 
     def __init__(self):
         self.cookies: Dict = {}
