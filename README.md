@@ -4,14 +4,17 @@
 ## Usage
 
 ```
-steam = Steam(
-    login='login',
-    password='password',
-)
+steam = Steam('login', 'password')
+
+# Authorization
 await steam.login_to_steam()
 
 # Check authorization
 result: bool = await steam.is_authorized()
+
+await steam.request('https://steamcommunity.com')
+await steam.request('https://store.steampowered.com')
+await steam.request('https://help.steampowered.com')
 
 # If account have Steam Guard
 steam = Steam(

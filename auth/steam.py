@@ -22,6 +22,7 @@ from auth.exceptions import LoginError
 from auth.schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
+    ServerTimeResponse,
 )
 from base.request import BaseRequestStrategy
 from base.storage import BaseCookieStorage
@@ -44,11 +45,6 @@ RequestStrategyType = TypeVar('RequestStrategyType', bound=RequestStrategyAbstra
 
 
 class Steam:
-
-    steam_guard_codes = [
-        50, 51, 52, 53, 54, 55, 56, 57, 66, 67, 68, 70, 71,
-        72, 74, 75, 77, 78, 80, 81, 82, 84, 86, 87, 88, 89,
-    ]
 
     def __init__(
         self,
@@ -153,8 +149,7 @@ class Steam:
             method='POST',
             url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
         )
-        data = json.loads(response)
-        return int(data['response']['server_time'])
+        return ServerTimeResponse.parse_raw(response).response.server_time
 
     async def get_steam_guard(self) -> str:
         """
@@ -171,7 +166,7 @@ class Steam:
         )
 
         value = data[19] & 0xF
-        code_point = (
+        full_code = (
             (data[value] & 0x7F) << 24 |       # noqa:W504
             (data[value + 1] & 0xFF) << 16 |   # noqa:W504
             (data[value + 2] & 0xFF) << 8 |    # noqa:W504
@@ -179,9 +174,10 @@ class Steam:
         )
 
         code = ''
+        chars = '23456789BCDFGHJKMNPQRTVWXY'
         for _ in range(5):
-            code += chr(self.steam_guard_codes[code_point % len(self.steam_guard_codes)])
-            code_point //= len(self.steam_guard_codes)
+            code += chars[full_code % len(chars)]
+            full_code //= len(chars)
 
         return code
 
