@@ -52,3 +52,10 @@ steam = Steam(
     cookie_storage=RedisCookieStorage
 )
 ```
+
+## Proto files
+
+- https://github.com/SteamDatabase/Protobufs/blob/master/steam/enums.proto
+- https://github.com/SteamDatabase/Protobufs/blob/master/steam/steammessages_base.proto
+- https://github.com/SteamDatabase/Protobufs/blob/master/steam/steammessages_auth.steamclient.proto
+- https://github.com/SteamDatabase/Protobufs/blob/master/steam/steammessages_unified_base.steamclient.proto
