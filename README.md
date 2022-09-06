@@ -12,6 +12,15 @@ await steam.login_to_steam()
 
 # Check authorization
 result: bool = await steam.is_authorized()
+
+# If account have Steam Guard
+steam = Steam(
+    login='login',
+    password='password',
+    authenticator=AuthenticatorData(
+        shared_secret='shared_secret',
+    ),
+)
 ```
 
 ## Cookie storage
