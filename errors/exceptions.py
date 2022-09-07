@@ -1,4 +1,4 @@
-from .codes import STEAM_ERROR_CODES
+from errors import STEAM_ERROR_CODES
 
 
 class SteamError(Exception):

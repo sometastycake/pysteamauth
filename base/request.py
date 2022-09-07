@@ -11,13 +11,11 @@ from aiohttp import (
     ClientSession,
 )
 
-from .. import (
-    abstract,
-    errors,
-)
+from abstract import RequestStrategyAbstract
+from errors import check_steam_error
 
 
-class BaseRequestStrategy(abstract.RequestStrategyAbstract):
+class BaseRequestStrategy(RequestStrategyAbstract):
 
     def __init__(self):
         self._session: Optional[ClientSession] = None
@@ -50,7 +48,7 @@ class BaseRequestStrategy(abstract.RequestStrategyAbstract):
         response = await self._request(url, method, **kwargs)
         error = response.headers.get('X-eresult')
         if error:
-            errors.check_steam_error(int(error))
+            check_steam_error(int(error))
         if in_bytes:
             return await response.content.read()
         return await response.text()
@@ -59,5 +57,5 @@ class BaseRequestStrategy(abstract.RequestStrategyAbstract):
         response = await self._request(url, method, **kwargs)
         error = response.headers.get('X-eresult')
         if error:
-            errors.check_steam_error(int(error))
+            check_steam_error(int(error))
         return {k: v.value for k, v in response.cookies.items()}
