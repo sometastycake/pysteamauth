@@ -1,4 +1,3 @@
-from .exceptions import LoginError
 from .schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
@@ -12,7 +11,6 @@ from .steam import Steam
 
 __all__ = [
     'Steam',
-    'LoginError',
     'ServerTime',
     'ServerTimeResponse',
     'FinalizeLoginStatus',

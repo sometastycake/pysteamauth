@@ -21,7 +21,6 @@ from .. import (
     base,
     pb2,
 )
-from .exceptions import LoginError
 from .schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
@@ -285,8 +284,6 @@ class Steam:
             encrypted_password=encrypted_password,
             rsa_timestamp=keys.timestamp,
         )
-        if not auth_session.steamid:
-            raise LoginError(f'Login error "{self.login}"')
         if auth_session.allowed_confirmations:
             if auth_session.allowed_confirmations[0].confirmation_type == pb2.k_EAuthSessionGuardType_DeviceCode:
                 code = await self.get_steam_guard()
