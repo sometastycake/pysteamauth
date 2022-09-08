@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pysteamauth',
-    version='0.0.1',
+    version='0.0.2',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',
