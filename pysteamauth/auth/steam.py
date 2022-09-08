@@ -287,7 +287,7 @@ class Steam:
         )
         return cookies['steamLoginSecure']
 
-    def is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
+    def _is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
         """
         Is twofactor required.
         """
@@ -307,7 +307,7 @@ class Steam:
             rsa_timestamp=keys.timestamp,
         )
         if auth_session.allowed_confirmations:
-            if self.is_twofactor_required(auth_session.allowed_confirmations[0]):
+            if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
                 code = await self.get_steam_guard()
                 await self._update_auth_session(
                     client_id=auth_session.client_id,
