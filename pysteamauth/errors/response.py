@@ -1,4 +1,4 @@
-from errors import (
+from pysteamauth.errors import (
     STEAM_ERROR_CODES,
     SteamError,
     UnknownSteamError,

@@ -15,22 +15,22 @@ from typing import (
 import rsa
 from aiohttp import FormData
 
-from abstract import (
+from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
-from auth.schemas import (
+from pysteamauth.auth.schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
     ServerTimeResponse,
 )
-from auth.utils import _get_host_from_url
-from base import (
+from pysteamauth.auth.utils import _get_host_from_url
+from pysteamauth.base import (
     BaseCookieStorage,
     BaseRequestStrategy,
 )
-from pb2 import k_ESessionPersistence_Persistent
-from pb2.steammessages_auth.steamclient_pb2 import (
+from pysteamauth.pb2 import k_ESessionPersistence_Persistent
+from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
     CAuthentication_BeginAuthSessionViaCredentials_Response,

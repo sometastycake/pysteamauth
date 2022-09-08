@@ -11,8 +11,8 @@ from aiohttp import (
     ClientSession,
 )
 
-from abstract import RequestStrategyAbstract
-from errors import check_steam_error
+from pysteamauth.abstract import RequestStrategyAbstract
+from pysteamauth.errors import check_steam_error
 
 
 class BaseRequestStrategy(RequestStrategyAbstract):

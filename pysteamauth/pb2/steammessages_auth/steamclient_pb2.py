@@ -9,11 +9,6 @@ from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import enum_type_wrapper
 
-import pb2.enums_pb2 as enums__pb2  # noqa
-import pb2.steammessages_base_pb2 as steammessages__base__pb2  # noqa
-from pb2.steammessages_unified_base import \
-    steamclient_pb2 as steammessages__unified__base_dot_steamclient__pb2  # noqa
-
 
 # @@protoc_insertion_point(imports)
 

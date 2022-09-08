@@ -1,6 +1,6 @@
 from typing import Dict
 
-from abstract import CookieStorageAbstract
+from pysteamauth.abstract import CookieStorageAbstract
 
 
 class BaseCookieStorage(CookieStorageAbstract):

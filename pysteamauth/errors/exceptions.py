@@ -1,4 +1,4 @@
-from errors import STEAM_ERROR_CODES
+from pysteamauth.errors import STEAM_ERROR_CODES
 
 
 class SteamError(Exception):
