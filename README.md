@@ -25,6 +25,20 @@ if __name__ == '__main__':
     asyncio.run(main())
 ```
 
+## If account have Steam Guard
+
+```python
+from pysteamauth.auth import Steam, AuthenticatorData
+
+steam = Steam(
+    login='login',
+    password='password',
+    authenticator=AuthenticatorData(
+        shared_secret='shared_secret'
+    )
+)
+```
+
 ## Cookie storage
 
 Library uses default cookie storage `BaseCookieStorage`, which stores Steam cookies in application memory.
