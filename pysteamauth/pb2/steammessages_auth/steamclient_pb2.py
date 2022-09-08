@@ -11,6 +11,7 @@ from google.protobuf.internal import enum_type_wrapper
 
 from pysteamauth.pb2.steammessages_unified_base import steamclient_pb2  # noqa
 
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()

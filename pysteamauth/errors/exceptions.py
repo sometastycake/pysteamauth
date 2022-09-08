@@ -9,6 +9,7 @@ class SteamError(Exception):
     def __str__(self) -> str:
         return str({
             'error': STEAM_ERROR_CODES.get(self.error_code, self.error_code),
+            'code': self.error_code,
         })
 
 

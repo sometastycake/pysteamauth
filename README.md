@@ -83,6 +83,23 @@ if __name__ == '__main__':
 
 ```
 
+## Error processing
+
+```python
+from pysteamauth.auth import Steam
+from pysteamauth.errors import SteamError
+
+steam = Steam('login', 'password')
+
+try:
+    await steam.login_to_steam()
+except SteamError as error:
+    print(error)
+```
+
+#### Output
+`{'error': 'InvalidPassword', 'code': 5}`
+
 ## Proto files
 
 - https://github.com/SteamDatabase/Protobufs/blob/master/steam/enums.proto
