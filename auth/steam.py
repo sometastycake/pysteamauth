@@ -31,6 +31,7 @@ from base import (
 )
 from pb2 import k_ESessionPersistence_Persistent
 from pb2.steammessages_auth.steamclient_pb2 import (
+    CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
     CAuthentication_BeginAuthSessionViaCredentials_Response,
     CAuthentication_GetPasswordRSAPublicKey_Request,
@@ -286,6 +287,12 @@ class Steam:
         )
         return cookies['steamLoginSecure']
 
+    def is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
+        """
+        Is twofactor required.
+        """
+        return confirmation.confirmation_type == k_EAuthSessionGuardType_DeviceCode
+
     async def login_to_steam(self) -> None:
         """
         Login to Steam.
@@ -300,7 +307,7 @@ class Steam:
             rsa_timestamp=keys.timestamp,
         )
         if auth_session.allowed_confirmations:
-            if auth_session.allowed_confirmations[0].confirmation_type == k_EAuthSessionGuardType_DeviceCode:
+            if self.is_twofactor_required(auth_session.allowed_confirmations[0]):
                 code = await self.get_steam_guard()
                 await self._update_auth_session(
                     client_id=auth_session.client_id,
@@ -308,23 +315,23 @@ class Steam:
                     code=code,
                     code_type=k_EAuthSessionGuardType_DeviceCode,
                 )
-        auth_session_status = await self._poll_auth_session_status(
+        session = await self._poll_auth_session_status(
             client_id=auth_session.client_id,
             request_id=auth_session.request_id,
         )
-        cookies = {}
-        transfer_info_response = await self._finalize_login(
-            refresh_token=auth_session_status.refresh_token,
+        tokens = await self._finalize_login(
+            refresh_token=session.refresh_token,
             sessionid=sessionid,
         )
-        for tranfer in transfer_info_response.transfer_info:
+        cookies = {}
+        for token in tokens.transfer_info:
             cookie = await self._set_token(
-                url=tranfer.url,
-                nonce=tranfer.params.nonce,
-                auth=tranfer.params.auth,
+                url=token.url,
+                nonce=token.params.nonce,
+                auth=token.params.auth,
                 steamid=auth_session.steamid,
             )
-            cookies[_get_host_from_url(tranfer.url)] = {
+            cookies[_get_host_from_url(token.url)] = {
                 'sessionid': sessionid,
                 'steamLoginSecure': cookie,
                 'Steam_Language': 'english',
