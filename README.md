@@ -3,7 +3,7 @@
 
 ## Usage
 
-```
+```python
 steam = Steam('login', 'password')
 
 # Authorization
@@ -31,7 +31,7 @@ steam = Steam(
 Library uses default cookie storage `BaseCookieStorage`, which stores Steam cookies in application memory.
 But you can write own cookie storage. For example, redis storage:
 
-```
+```python
 class RedisCookieStorage(CookieStorageAbstract):
 
     redis = Redis()
