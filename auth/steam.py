@@ -331,9 +331,11 @@ class Steam:
                 auth=token.params.auth,
                 steamid=auth_session.steamid,
             )
-            cookies[_get_host_from_url(token.url)] = {
-                'sessionid': sessionid,
-                'steamLoginSecure': cookie,
-                'Steam_Language': 'english',
-            }
+            cookies.update({
+                _get_host_from_url(token.url): {
+                    'sessionid': sessionid,
+                    'steamLoginSecure': cookie,
+                    'Steam_Language': 'english',
+                }
+            })
         await self._storage.set(login=self._login, cookies=cookies)
