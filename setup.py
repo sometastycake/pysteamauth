@@ -1,9 +1,10 @@
+import setuptools
 from setuptools import setup
 
 
 setup(
     name='pysteamauth',
-    version='0.0.2',
+    version='0.0.4',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',
@@ -11,6 +12,7 @@ setup(
     description='Asynchronous python library for Steam authorization using protobuf',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
+    packages=setuptools.find_packages(),
     install_requires=[
         'aiohttp==3.8.1',
         'aiosignal==1.2.0',
