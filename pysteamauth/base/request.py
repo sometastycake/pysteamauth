@@ -44,20 +44,18 @@ class BaseRequestStrategy(RequestStrategyAbstract):
     async def _request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
         if self._session is None:
             self._session = self._create_session()
-        return await self._session.request(method, url, **kwargs)
-
-    async def request(self, url: str, method: str, in_bytes: bool = False, **kwargs: Any) -> Union[str, bytes]:
-        response = await self._request(url, method, **kwargs)
+        response = await self._session.request(method, url, **kwargs)
         error = response.headers.get('X-eresult')
         if error:
             check_steam_error(int(error))
+        return response
+
+    async def request(self, url: str, method: str, in_bytes: bool = False, **kwargs: Any) -> Union[str, bytes]:
+        response = await self._request(url, method, **kwargs)
         if in_bytes:
             return await response.content.read()
         return await response.text()
 
     async def get_cookies(self, url: str, method: str, **kwargs: Any) -> COOKIES_DOMAIN_TYPE:
         response = await self._request(url, method, **kwargs)
-        error = response.headers.get('X-eresult')
-        if error:
-            check_steam_error(int(error))
         return {k: v.value for k, v in response.cookies.items()}
