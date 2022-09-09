@@ -7,7 +7,7 @@ from typing import (
     Union,
 )
 
-from pysteamauth.abstract import COOKIES_DOMAIN_TYPE
+from .storage import COOKIES_DOMAIN_TYPE
 
 
 class RequestStrategyAbstract(ABC):

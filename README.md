@@ -103,6 +103,41 @@ if __name__ == '__main__':
     asyncio.run(main())
 ```
 
+#### Or
+
+```python
+import asyncio
+
+from pysteamauth.auth import Steam
+from pysteamauth.errors import SteamError, custom_error_exception
+from pysteamauth.errors import STEAM_ERROR_CODES  # Steam error codes
+
+
+class LoginError(SteamError):
+    ...
+
+
+class RateLimitExceeded(SteamError):
+    ...
+
+
+custom_error_exception({
+    5: LoginError,
+    84: RateLimitExceeded,
+})
+
+
+async def main():
+    try:
+        await Steam('login', 'password').login_to_steam()
+    except LoginError as error:
+        print(error)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
+```
+
 #### Output
 `{'error': 'InvalidPassword', 'code': 5}`
 
