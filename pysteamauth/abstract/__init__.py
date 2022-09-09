@@ -1,8 +1,14 @@
 from .request import RequestStrategyAbstract
-from .storage import CookieStorageAbstract
+from .storage import (
+    COOKIES_DOMAIN_TYPE,
+    COOKIES_TYPE,
+    CookieStorageAbstract,
+)
 
 
 __all__ = [
     'RequestStrategyAbstract',
     'CookieStorageAbstract',
+    'COOKIES_TYPE',
+    'COOKIES_DOMAIN_TYPE',
 ]

@@ -1,6 +1,5 @@
 from typing import (
     Any,
-    Dict,
     Optional,
     Union,
 )
@@ -11,7 +10,10 @@ from aiohttp import (
     ClientSession,
 )
 
-from pysteamauth.abstract import RequestStrategyAbstract
+from pysteamauth.abstract import (
+    COOKIES_DOMAIN_TYPE,
+    RequestStrategyAbstract,
+)
 from pysteamauth.errors import check_steam_error
 
 
@@ -53,7 +55,7 @@ class BaseRequestStrategy(RequestStrategyAbstract):
             return await response.content.read()
         return await response.text()
 
-    async def get_cookies(self, url: str, method: str, **kwargs: Any) -> Dict[str, str]:
+    async def get_cookies(self, url: str, method: str, **kwargs: Any) -> COOKIES_DOMAIN_TYPE:
         response = await self._request(url, method, **kwargs)
         error = response.headers.get('X-eresult')
         if error:
