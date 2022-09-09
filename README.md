@@ -86,15 +86,21 @@ if __name__ == '__main__':
 ## Error processing
 
 ```python
+import asyncio
+
 from pysteamauth.auth import Steam
 from pysteamauth.errors import SteamError
 
-steam = Steam('login', 'password')
 
-try:
-    await steam.login_to_steam()
-except SteamError as error:
-    print(error)
+async def main():
+    try:
+        await Steam('login', 'password').login_to_steam()
+    except SteamError as error:
+        print(error)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
 ```
 
 #### Output
