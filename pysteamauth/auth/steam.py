@@ -6,6 +6,7 @@ import math
 from struct import pack
 from typing import (
     Any,
+    Dict,
     Optional,
     Type,
     TypeVar,
@@ -70,6 +71,16 @@ class Steam:
         self._authenticator = authenticator
         self._http: RequestStrategyType = request_strategy()
         self._storage = cookie_storage()
+
+    @property
+    def login(self) -> str:
+        return self._login
+
+    async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
+        return await self._storage.get(
+            login=self._login,
+            domain=domain,
+        )
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         """

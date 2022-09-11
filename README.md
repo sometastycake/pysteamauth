@@ -120,8 +120,7 @@ class RateLimitExceeded(SteamError):
     ...
 
 
-# Steam error codes
-# from pysteamauth.errors import STEAM_ERROR_CODES
+# Error codes are stored in pysteamauth.errors
 custom_error_exception({
     5: LoginError,
     84: RateLimitExceeded,
