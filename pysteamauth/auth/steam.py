@@ -75,12 +75,17 @@ class Steam:
         """
         Request with Steam session.
         """
+        domain = get_host_from_url(url)
+
+        if domain not in self.domains:
+            raise RuntimeError(f'Wrong domain "{domain}"')
+
         return await self._http.text(
             url=url,
             method=method,
             cookies=await self._storage.get(
                 login=self._login,
-                domain=get_host_from_url(url),
+                domain=domain,
             ),
             **kwargs,
         )
