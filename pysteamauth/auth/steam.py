@@ -133,8 +133,8 @@ class Steam:
             url='https://api.steampowered.com/IAuthenticationService/BeginAuthSessionViaCredentials/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
-                ]
+                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
+                ],
             ),
         )
         return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
@@ -154,6 +154,9 @@ class Steam:
         Calculating Steam Guard code.
         """
         server_time = await self._get_server_time()
+
+        if self._authenticator is None:
+            raise RuntimeError('Not found authenticator')
 
         data = binascii.unhexlify(
             hmac.new(
@@ -216,8 +219,8 @@ class Steam:
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithSteamGuardCode/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
-                ]
+                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
+                ],
             ),
         )
 
@@ -238,8 +241,8 @@ class Steam:
             url='https://api.steampowered.com/IAuthenticationService/PollAuthSessionStatus/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8'))
-                ]
+                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
+                ],
             ),
         )
         return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
@@ -310,7 +313,7 @@ class Steam:
         )
         tokens = await self._finalize_login(
             refresh_token=session.refresh_token,
-            sessionid=self._http.cookies()['sessionid']
+            sessionid=self._http.cookies()['sessionid'],
         )
         for token in tokens.transfer_info:
             await self._set_token(

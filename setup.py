@@ -16,7 +16,7 @@ requirements = [
     'pydantic>=1.10.2',
     'rsa>=4.9',
     'typing_extensions>=4.3.0',
-    'yarl>=1.8.1'
+    'yarl>=1.8.1',
 ]
 
 

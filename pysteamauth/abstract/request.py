@@ -13,17 +13,17 @@ from aiohttp import ClientResponse
 class RequestStrategyAbstract(ABC):
 
     @abstractmethod
-    async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
+    async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:  # noqa:U100
         ...
 
     @abstractmethod
-    async def text(self, url: str, method: str, **kwargs: Any) -> str:
+    async def text(self, url: str, method: str, **kwargs: Any) -> str:  # noqa:U100
         ...
 
     @abstractmethod
-    async def bytes(self, url: str, method: str, **kwargs: Any) -> bytes:
+    async def bytes(self, url: str, method: str, **kwargs: Any) -> bytes:  # noqa:U100
         ...
 
     @abstractmethod
-    def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
+    def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:  # noqa:U100
         ...
