@@ -38,3 +38,11 @@ class ServerTime(BaseModel):
 
 class ServerTimeResponse(BaseModel):
     response: ServerTime
+
+
+class SteamAuthorizationStatus(BaseModel):
+    logged_in: bool
+    steamid: str
+    accountid: int
+    account_name: str
+    token: str

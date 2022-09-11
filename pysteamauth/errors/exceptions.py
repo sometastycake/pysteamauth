@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pysteamauth.errors import STEAM_ERROR_CODES
+from .codes import STEAM_ERROR_CODES
 
 
 _CUSTOM_ERROR_EXCEPTIONS = {}

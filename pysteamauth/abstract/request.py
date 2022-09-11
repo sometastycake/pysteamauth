@@ -4,17 +4,26 @@ from abc import (
 )
 from typing import (
     Any,
-    Union,
+    Mapping,
 )
 
-from .storage import COOKIES_DOMAIN_TYPE
+from aiohttp import ClientResponse
 
 
 class RequestStrategyAbstract(ABC):
 
     @abstractmethod
-    async def request(self, url: str, method: str, in_bytes: bool = False, **kwargs: Any) -> Union[str, bytes]:
+    async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
         ...
 
-    async def get_cookies(self, url: str, method: str, **kwargs: Any) -> COOKIES_DOMAIN_TYPE:
+    @abstractmethod
+    async def text(self, url: str, method: str, **kwargs: Any) -> str:
+        ...
+
+    @abstractmethod
+    async def bytes(self, url: str, method: str, **kwargs: Any) -> bytes:
+        ...
+
+    @abstractmethod
+    def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
         ...

@@ -1,21 +1,20 @@
-from typing import Dict
-
-from pysteamauth.abstract import (
-    COOKIES_DOMAIN_TYPE,
-    COOKIES_TYPE,
-    CookieStorageAbstract,
+from typing import (
+    Dict,
+    Mapping,
 )
+
+from pysteamauth.abstract import CookieStorageAbstract
 
 
 class BaseCookieStorage(CookieStorageAbstract):
 
     def __init__(self):
-        self.cookies: Dict[str, COOKIES_TYPE] = {}
+        self.cookies: Dict[str, Mapping[str, Mapping[str, str]]] = {}
 
-    async def set(self, login: str, cookies: COOKIES_TYPE) -> None:
+    async def set(self, login: str, cookies: Mapping[str, Mapping[str, str]]) -> None:
         self.cookies[login] = cookies
 
-    async def get(self, login: str, domain: str = 'steamcommunity.com') -> COOKIES_DOMAIN_TYPE:
+    async def get(self, login: str, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
         cookies = self.cookies.get(login)
         if not cookies:
             return {}

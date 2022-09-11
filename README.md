@@ -110,7 +110,6 @@ import asyncio
 
 from pysteamauth.auth import Steam
 from pysteamauth.errors import SteamError, custom_error_exception
-from pysteamauth.errors import STEAM_ERROR_CODES  # Steam error codes
 
 
 class LoginError(SteamError):
@@ -121,6 +120,8 @@ class RateLimitExceeded(SteamError):
     ...
 
 
+# Steam error codes
+# from pysteamauth.errors import STEAM_ERROR_CODES
 custom_error_exception({
     5: LoginError,
     84: RateLimitExceeded,
