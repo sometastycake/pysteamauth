@@ -3,10 +3,10 @@ from setuptools import setup
 
 
 requirements = [
-    'aiohttp>=3.8.1',
-    'protobuf>=4.21.5',
-    'pydantic>=1.10.2',
-    'rsa>=4.9',
+    'aiohttp>=3.6.0',
+    'protobuf>=4.21.1',
+    'pydantic>=1.8.1',
+    'rsa>=4.8',
 ]
 
 
@@ -22,7 +22,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=setuptools.find_packages(),
     zip_safe=False,
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=requirements,
     setup_requires=requirements,
     include_package_data=True,
