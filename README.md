@@ -1,5 +1,9 @@
 # Asynchronous python library for Steam authorization using protobuf
 
+[![Code size: isort](https://img.shields.io/github/languages/code-size/sometastycake/pysteamauth)]()
+[![Imports: isort](https://img.shields.io/badge/imports-isort-success)](https://pycqa.github.io/isort/)
+[![Imports: isort](https://img.shields.io/badge/code%20style-flake8-9cf)](https://github.com/PyCQA/flake8)
+
 
 ## Usage
 
