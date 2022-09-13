@@ -14,3 +14,7 @@ class CookieStorageAbstract(ABC):
     @abstractmethod
     async def get(self, login: str, domain: str = 'steamcommunity.com') -> Mapping[str, str]:  # noqa:U100
         ...
+
+    @abstractmethod
+    async def clear(self, login: str) -> None:  # noqa:U100
+        ...

@@ -71,6 +71,9 @@ class RedisStorage(CookieStorageAbstract):
         if not cookies:
             return {}
         return json.loads(cookies).get(domain, {})
+    
+    async def clear(self, login: str):
+        await self.redis.delete(*[login])
 
 
 async def main():

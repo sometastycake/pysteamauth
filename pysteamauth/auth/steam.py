@@ -303,6 +303,7 @@ class Steam:
         """
         if await self.is_authorized():
             return
+        await self._storage.clear(self._login)
         keys = await self._getrsakey()
         encrypted_password = self._encrypt_password(keys)
         auth_session = await self._begin_auth_session(
