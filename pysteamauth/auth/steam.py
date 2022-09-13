@@ -6,10 +6,9 @@ import math
 from struct import pack
 from typing import (
     Any,
-    Dict,
+    Mapping,
     Optional,
     Type,
-    TypeVar,
 )
 
 import rsa
@@ -23,7 +22,6 @@ from pysteamauth.base import (
     BaseCookieStorage,
     BaseRequestStrategy,
 )
-from pysteamauth.pb2 import k_ESessionPersistence_Persistent
 from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
@@ -33,10 +31,11 @@ from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     CAuthentication_PollAuthSessionStatus_Request,
     CAuthentication_PollAuthSessionStatus_Response,
     CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
-    k_EAuthSessionGuardType_DeviceCode,
-    k_EAuthTokenPlatformType_WebBrowser,
+    EAuthSessionGuardType,
+    EAuthTokenPlatformType,
 )
 
+from ..pb2.enums_pb2 import ESessionPersistence
 from .schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
@@ -44,10 +43,6 @@ from .schemas import (
     SteamAuthorizationStatus,
 )
 from .utils import get_host_from_url
-
-
-CookieStorageType = TypeVar('CookieStorageType', bound=CookieStorageAbstract)
-RequestStrategyType = TypeVar('RequestStrategyType', bound=RequestStrategyAbstract)
 
 
 class Steam:
@@ -63,20 +58,20 @@ class Steam:
         login: str,
         password: str,
         authenticator: Optional[AuthenticatorData] = None,
-        cookie_storage: Type[CookieStorageType] = BaseCookieStorage,
-        request_strategy: Type[RequestStrategyType] = BaseRequestStrategy,
+        cookie_storage: Type[CookieStorageAbstract] = BaseCookieStorage,
+        request_strategy: Type[RequestStrategyAbstract] = BaseRequestStrategy,
     ):
         self._login = login
         self._password = password
         self._authenticator = authenticator
-        self._http: RequestStrategyType = request_strategy()
+        self._http = request_strategy()
         self._storage = cookie_storage()
 
     @property
     def login(self) -> str:
         return self._login
 
-    async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
+    async def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
         return await self._storage.get(
             login=self._login,
             domain=domain,
@@ -139,9 +134,9 @@ class Steam:
             encrypted_password=encrypted_password,
             encryption_timestamp=rsa_timestamp,
             remember_login=True,
-            platform_type=k_EAuthTokenPlatformType_WebBrowser,
+            platform_type=EAuthTokenPlatformType.k_EAuthTokenPlatformType_WebBrowser,
             website_id='Community',
-            persistence=k_ESessionPersistence_Persistent,
+            persistence=ESessionPersistence.k_ESessionPersistence_Persistent,
             device_friendly_name='Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8',
         )
         response = await self._http.bytes(
@@ -300,7 +295,7 @@ class Steam:
         """
         Is twofactor required.
         """
-        return confirmation.confirmation_type == k_EAuthSessionGuardType_DeviceCode
+        return confirmation.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode
 
     async def login_to_steam(self) -> None:
         """
@@ -321,7 +316,7 @@ class Steam:
                     client_id=auth_session.client_id,
                     steamid=auth_session.steamid,
                     code=code,
-                    code_type=k_EAuthSessionGuardType_DeviceCode,
+                    code_type=EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode,
                 )
         session = await self._poll_auth_session_status(
             client_id=auth_session.client_id,
