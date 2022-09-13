@@ -2,8 +2,8 @@
 
 [![Code size: pysteamauth](https://img.shields.io/github/languages/code-size/sometastycake/pysteamauth)]()
 [![Imports: isort](https://img.shields.io/badge/imports-isort-success)](https://pycqa.github.io/isort/)
-[![Linter: flake8](https://img.shields.io/badge/linter-flake8-9cf)](https://github.com/PyCQA/flake8)
-[![Mypy: checked](https://img.shields.io/badge/mypy-checked-blue)](https://github.com/python/mypy)
+[![Linter: flake8](https://img.shields.io/badge/linter-flake8-success)](https://github.com/PyCQA/flake8)
+[![Mypy: checked](https://img.shields.io/badge/mypy-checked-success)](https://github.com/python/mypy)
 
 
 ## Usage
