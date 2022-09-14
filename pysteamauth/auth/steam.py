@@ -22,6 +22,7 @@ from pysteamauth.base import (
     BaseCookieStorage,
     BaseRequestStrategy,
 )
+from pysteamauth.pb2.enums_pb2 import ESessionPersistence
 from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
@@ -35,7 +36,6 @@ from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     EAuthTokenPlatformType,
 )
 
-from ..pb2.enums_pb2 import ESessionPersistence
 from .schemas import (
     AuthenticatorData,
     FinalizeLoginStatus,
