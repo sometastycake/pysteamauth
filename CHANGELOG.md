@@ -1,6 +1,6 @@
 # Pysteamauth changelog
 
-## v0.0.1
+## [v0.0.1 (2022-09-14)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.1)
 
 Library release
 
