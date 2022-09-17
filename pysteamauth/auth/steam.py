@@ -100,13 +100,18 @@ class Steam:
         if domain not in self.domains:
             raise RuntimeError(f'Wrong domain "{domain}"')
 
+        cookies = await self._storage.get(
+            login=self._login,
+            domain=domain,
+        )
+
         return await self._http.text(
             url=url,
             method=method,
-            cookies=await self._storage.get(
-                login=self._login,
-                domain=domain,
-            ),
+            cookies={
+                **cookies,
+                **kwargs.pop('cookies', {}),
+            },
             **kwargs,
         )
 
