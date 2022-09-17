@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 class AuthenticatorData(BaseModel):
     shared_secret: str
+    identity_secret: str
+    device_id: str
 
 
 class Params(BaseModel):

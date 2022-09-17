@@ -7,12 +7,13 @@ requirements = [
     'protobuf>=4.21.1',
     'pydantic>=1.8.1',
     'rsa>=4.8',
+    'bitstring>=3.1.9',
 ]
 
 
 setup(
     name='pysteamauth',
-    version='0.0.1',
+    version='0.0.2',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',

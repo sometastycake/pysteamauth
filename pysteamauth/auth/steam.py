@@ -13,6 +13,7 @@ from typing import (
 
 import rsa
 from aiohttp import FormData
+from bitstring import BitArray
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
@@ -57,15 +58,25 @@ class Steam:
         self,
         login: str,
         password: str,
+        steamid: int,
         authenticator: Optional[AuthenticatorData] = None,
         cookie_storage: Type[CookieStorageAbstract] = BaseCookieStorage,
         request_strategy: Type[RequestStrategyAbstract] = BaseRequestStrategy,
     ):
         self._login = login
+        self._steamid = steamid
         self._password = password
         self._authenticator = authenticator
         self._http = request_strategy()
         self._storage = cookie_storage()
+
+    @property
+    def steamid(self) -> int:
+        return self._steamid
+
+    @property
+    def authenticator(self) -> Optional[AuthenticatorData]:
+        return self._authenticator
 
     @property
     def login(self) -> str:
@@ -76,6 +87,9 @@ class Steam:
             login=self._login,
             domain=domain,
         )
+
+    async def sessionid(self, domain: str = 'steamcommunity.com') -> str:
+        return (await self.cookies(domain))['sessionid']
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         """
@@ -150,7 +164,7 @@ class Steam:
         )
         return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
 
-    async def _get_server_time(self) -> int:
+    async def get_server_time(self) -> int:
         """
         Get server time.
         """
@@ -160,12 +174,10 @@ class Steam:
         )
         return ServerTimeResponse.parse_raw(response).response.server_time
 
-    async def get_steam_guard(self) -> str:
+    async def get_steam_guard(self, server_time: int) -> str:
         """
         Calculating Steam Guard code.
         """
-        server_time = await self._get_server_time()
-
         if self._authenticator is None:
             raise RuntimeError('Not found authenticator')
 
@@ -192,6 +204,33 @@ class Steam:
             full_code //= len(chars)
 
         return code
+
+    def get_confirmation_hash(self, server_time: int, tag: str = 'conf') -> str:
+        """
+        Get mobile confirmation hash.
+        """
+        if self._authenticator is None:
+            raise RuntimeError('Not found authenticator')
+        identitysecret = base64.b64decode(
+            self._authenticator.identity_secret,
+        )
+        secret = BitArray(
+            bytes=identitysecret,
+            length=len(identitysecret) * 8,
+        )
+        tag_buffer = BitArray(
+            bytes=tag.encode('utf8'),
+            length=len(tag) * 8,
+        )
+        buffer = BitArray(4 * 8)
+        buffer.append(BitArray(int=server_time, length=32))
+        buffer.append(tag_buffer)
+        confirmation = hmac.new(
+            key=secret.tobytes(),
+            msg=buffer.tobytes(),
+            digestmod=hashlib.sha1,
+        )
+        return str(base64.b64encode(confirmation.digest()), 'utf8')
 
     def _encrypt_password(self, keys: CAuthentication_GetPasswordRSAPublicKey_Response) -> str:
         """
@@ -312,7 +351,8 @@ class Steam:
         )
         if auth_session.allowed_confirmations:
             if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
-                code = await self.get_steam_guard()
+                server_time = await self.get_server_time()
+                code = await self.get_steam_guard(server_time)
                 await self._update_auth_session(
                     client_id=auth_session.client_id,
                     steamid=auth_session.steamid,
@@ -327,6 +367,7 @@ class Steam:
             refresh_token=session.refresh_token,
             sessionid=self._http.cookies()['sessionid'],
         )
+
         for token in tokens.transfer_info:
             await self._set_token(
                 url=token.url,
