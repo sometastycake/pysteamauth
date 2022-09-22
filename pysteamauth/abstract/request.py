@@ -4,13 +4,17 @@ from abc import (
 )
 from typing import (
     Any,
+    Dict,
     Mapping,
+    Type,
 )
 
 from aiohttp import ClientResponse
 
 
 class RequestStrategyAbstract(ABC):
+
+    http_status_exception: Dict[int, Type[Exception]] = {}
 
     @abstractmethod
     async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:  # noqa:U100
