@@ -15,7 +15,10 @@ from aiohttp import (
 
 from pysteamauth.abstract import RequestStrategyAbstract
 from pysteamauth.errors import check_steam_error
-from pysteamauth.errors.exceptions import UnauthorizedSteamRequest, TooManySteamRequests
+from pysteamauth.errors.exceptions import (
+    TooManySteamRequests,
+    UnauthorizedSteamRequest,
+)
 
 
 class BaseRequestStrategy(RequestStrategyAbstract):

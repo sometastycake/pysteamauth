@@ -24,7 +24,11 @@ from pysteamauth.auth import Steam
 
 
 async def main():
-    steam = Steam('login', 'password')
+    steam = Steam(
+        login='login', 
+        password='password',
+        steamid=123456789,
+    )
     
     await steam.login_to_steam()
 
@@ -47,8 +51,11 @@ from pysteamauth.auth import Steam, AuthenticatorData
 steam = Steam(
     login='login',
     password='password',
+    steamid=123456789,
     authenticator=AuthenticatorData(
-        shared_secret='shared_secret'
+        shared_secret='shared_secret',
+        device_id='device_id',
+        identity_secret='identity_secret',
     )
 )
 ```
@@ -80,15 +87,13 @@ class RedisStorage(CookieStorageAbstract):
         if not cookies:
             return {}
         return json.loads(cookies).get(domain, {})
-    
-    async def clear(self, login: str):
-        await self.redis.delete(*[login])
 
 
 async def main():
     steam = Steam(
         login='login',
         password='password',
+        steamid=123456789,
         cookie_storage=RedisStorage,
     )
     
@@ -111,7 +116,7 @@ from pysteamauth.errors import SteamError
 
 async def main():
     try:
-        await Steam('login', 'password').login_to_steam()
+        await Steam('login', 'password', 123456789).login_to_steam()
     except SteamError as error:
         print(error)
 
@@ -146,7 +151,7 @@ custom_error_exception({
 
 async def main():
     try:
-        await Steam('login', 'password').login_to_steam()
+        await Steam('login', 'password', 123456789).login_to_steam()
     except LoginError as error:
         print(error)
 

@@ -19,6 +19,3 @@ class BaseCookieStorage(CookieStorageAbstract):
         if not cookies:
             return {}
         return cookies.get(domain, {})
-
-    async def clear(self, login: str) -> None:
-        self.cookies.pop(login, None)

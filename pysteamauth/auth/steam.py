@@ -347,7 +347,11 @@ class Steam:
         """
         if await self.is_authorized():
             return
-        await self._storage.clear(self._login)
+        if not self._http.cookies().get('sessionid'):
+            await self._http.request(
+                method='GET',
+                url='https://steamcommunity.com',
+            )
         keys = await self._getrsakey()
         encrypted_password = self._encrypt_password(keys)
         auth_session = await self._begin_auth_session(
@@ -380,15 +384,15 @@ class Steam:
                 auth=token.params.auth,
                 steamid=auth_session.steamid,
             )
-
-        # Needs to get additional cookies
-        await self._http.request(method='GET', url='https://store.steampowered.com')
-        await self._http.request(method='GET', url='https://help.steampowered.com')
-
+        # Needs to get additional cookies through aiohttp session
+        for domain in ('store', 'help'):
+            await self._http.request(
+                method='GET',
+                url=f'https://{domain}.steampowered.com',
+            )
         # Write cookies from aiohttp session
         cookies = {}
         for domain in self.domains:
             cookies[domain] = self._http.cookies(domain)
-
         # Save cookies to storage
         await self._storage.set(login=self._login, cookies=cookies)
