@@ -42,9 +42,9 @@ def custom_error_exception(errors: Dict) -> None:
         _CUSTOM_ERROR_EXCEPTIONS[_error] = _exception
 
 
-class UnauthorizedSteamRequest(Exception):
+class UnauthorizedSteamRequestError(Exception):
     ...
 
 
-class TooManySteamRequests(Exception):
+class TooManySteamRequestsError(Exception):
     ...

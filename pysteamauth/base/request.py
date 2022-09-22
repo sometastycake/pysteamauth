@@ -16,16 +16,16 @@ from aiohttp import (
 from pysteamauth.abstract import RequestStrategyAbstract
 from pysteamauth.errors import check_steam_error
 from pysteamauth.errors.exceptions import (
-    TooManySteamRequests,
-    UnauthorizedSteamRequest,
+    TooManySteamRequestsError,
+    UnauthorizedSteamRequestError,
 )
 
 
 class BaseRequestStrategy(RequestStrategyAbstract):
 
     http_status_exception: Dict[int, Type[Exception]] = {
-        401: UnauthorizedSteamRequest,
-        429: TooManySteamRequests,
+        401: UnauthorizedSteamRequestError,
+        429: TooManySteamRequestsError,
     }
 
     def __init__(self):
