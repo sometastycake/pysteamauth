@@ -1,12 +1,10 @@
 from typing import (
     Dict,
     Optional,
+    Type,
 )
 
 from .codes import STEAM_ERROR_CODES
-
-
-_CUSTOM_ERROR_EXCEPTIONS = {}
 
 
 class SteamError(Exception):
@@ -27,7 +25,10 @@ class UnknownSteamError(SteamError):
     ...
 
 
-def custom_error_exception(errors: Dict) -> None:
+_CUSTOM_ERROR_EXCEPTIONS: Dict[int, Type[SteamError]] = {}
+
+
+def custom_error_exception(errors: Dict[int, Type[SteamError]]) -> None:
     global _CUSTOM_ERROR_EXCEPTIONS
     if not isinstance(errors, dict):
         raise TypeError('The error argument should be dict')
