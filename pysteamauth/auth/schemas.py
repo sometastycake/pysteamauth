@@ -1,4 +1,7 @@
-from typing import List
+from typing import (
+    List,
+    Optional,
+)
 
 from pydantic import BaseModel
 
@@ -47,4 +50,4 @@ class SteamAuthorizationStatus(BaseModel):
     steamid: str
     accountid: int
     account_name: str
-    token: str
+    token: Optional[str]
