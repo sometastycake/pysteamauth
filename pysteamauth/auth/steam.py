@@ -348,7 +348,7 @@ class Steam:
         if await self.is_authorized():
             return
         if not self._http.cookies().get('sessionid'):
-            await self._http.request(
+            await self._http.bytes(
                 method='GET',
                 url='https://steamcommunity.com',
             )
@@ -386,7 +386,7 @@ class Steam:
             )
         # Needs to get additional cookies through aiohttp session
         for domain in ('store', 'help'):
-            await self._http.request(
+            await self._http.bytes(
                 method='GET',
                 url=f'https://{domain}.steampowered.com',
             )
