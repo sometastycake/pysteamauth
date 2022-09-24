@@ -1,5 +1,9 @@
 # Pysteamauth changelog
 
+## [v0.0.3 (2022-09-25)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.3)
+
+- Use method _bytes_ for Steam requests
+
 ## [v0.0.2 (2022-09-24)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.2)
 
 - New method _get_confirmation_hash_
