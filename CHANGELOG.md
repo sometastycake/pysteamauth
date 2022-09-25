@@ -1,5 +1,9 @@
 # Pysteamauth changelog
 
+## [v0.0.5 (2022-09-25)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.5)
+
+- Updated protobuf version
+
 ## [v0.0.4 (2022-09-25)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.4)
 
 - Reduced versions of dependencies
