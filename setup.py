@@ -4,7 +4,7 @@ from setuptools import setup
 
 requirements = [
     'aiohttp>=3.5.0',
-    'protobuf>=3.14.0,!=3.18.3',
+    'protobuf>3.18.3',
     'pydantic>=1.5',
     'rsa>=4.0',
     'bitstring>=3.1.2',
@@ -13,7 +13,7 @@ requirements = [
 
 setup(
     name='pysteamauth',
-    version='0.0.4',
+    version='0.0.5',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',
