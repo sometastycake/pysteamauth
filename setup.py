@@ -3,17 +3,17 @@ from setuptools import setup
 
 
 requirements = [
-    'aiohttp>=3.6.0',
-    'protobuf>=4.21.1',
-    'pydantic>=1.8.1',
-    'rsa>=4.8',
-    'bitstring>=3.1.9',
+    'aiohttp>=3.5.0',
+    'protobuf>=3.14.0,!=3.18.3',
+    'pydantic>=1.5',
+    'rsa>=4.0',
+    'bitstring>=3.1.2',
 ]
 
 
 setup(
     name='pysteamauth',
-    version='0.0.3',
+    version='0.0.4',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',
