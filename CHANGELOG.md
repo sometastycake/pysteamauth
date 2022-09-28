@@ -1,5 +1,9 @@
 # Pysteamauth changelog
 
+## [v0.0.6 (2022-09-28)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.6)
+
+- Fixed _check_http_status_ method
+
 ## [v0.0.5 (2022-09-25)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.5)
 
 - Updated protobuf version
