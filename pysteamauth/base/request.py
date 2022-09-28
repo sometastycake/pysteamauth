@@ -9,7 +9,6 @@ from typing import (
 import aiohttp
 from aiohttp import (
     ClientResponse,
-    ClientResponseError,
     ClientSession,
 )
 
@@ -47,13 +46,11 @@ class BaseRequestStrategy(RequestStrategyAbstract):
         return ClientSession(connector=aiohttp.TCPConnector(ssl=False))
 
     def _check_http_status(self, response: ClientResponse) -> None:
-        try:
-            response.raise_for_status()
-        except ClientResponseError as error:
-            if error.status in self.http_status_exception:
-                raise self.http_status_exception[error.status](
-                    f'Wrong HTTP status from Steam {error.status} url="{response.url}"',
-                )
+        status = response.status
+        if not response.ok and status in self.http_status_exception:
+            raise self.http_status_exception[status](
+                f'Wrong HTTP status from Steam {status} url="{response.url}"',
+            )
 
     async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
         if self._session is None:
