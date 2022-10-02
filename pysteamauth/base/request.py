@@ -1,9 +1,7 @@
 from typing import (
     Any,
-    Dict,
     Mapping,
     Optional,
-    Type,
 )
 
 import aiohttp
@@ -14,18 +12,9 @@ from aiohttp import (
 
 from pysteamauth.abstract import RequestStrategyAbstract
 from pysteamauth.errors import check_steam_error
-from pysteamauth.errors.exceptions import (
-    TooManySteamRequestsError,
-    UnauthorizedSteamRequestError,
-)
 
 
 class BaseRequestStrategy(RequestStrategyAbstract):
-
-    http_status_exception: Dict[int, Type[Exception]] = {
-        401: UnauthorizedSteamRequestError,
-        429: TooManySteamRequestsError,
-    }
 
     def __init__(self):
         self._session: Optional[ClientSession] = None
@@ -45,13 +34,6 @@ class BaseRequestStrategy(RequestStrategyAbstract):
         """
         return ClientSession(connector=aiohttp.TCPConnector(ssl=False))
 
-    def _check_http_status(self, response: ClientResponse) -> None:
-        status = response.status
-        if not response.ok and status in self.http_status_exception:
-            raise self.http_status_exception[status](
-                f'Wrong HTTP status from Steam {status} url="{response.url}"',
-            )
-
     async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
         if self._session is None:
             self._session = self._create_session()
@@ -59,7 +41,6 @@ class BaseRequestStrategy(RequestStrategyAbstract):
         error = response.headers.get('X-eresult')
         if error:
             check_steam_error(int(error))
-        self._check_http_status(response)
         return response
 
     def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
