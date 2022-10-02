@@ -1,8 +1,6 @@
 from .codes import STEAM_ERROR_CODES
 from .exceptions import (
     SteamError,
-    TooManySteamRequestsError,
-    UnauthorizedSteamRequestError,
     UnknownSteamError,
     custom_error_exception,
 )
@@ -15,6 +13,4 @@ __all__ = [
     'UnknownSteamError',
     'STEAM_ERROR_CODES',
     'custom_error_exception',
-    'UnauthorizedSteamRequestError',
-    'TooManySteamRequestsError',
 ]

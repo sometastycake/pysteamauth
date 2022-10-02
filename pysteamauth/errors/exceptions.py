@@ -41,11 +41,3 @@ def custom_error_exception(errors: Dict[int, Type[SteamError]]) -> None:
         if _error not in STEAM_ERROR_CODES:
             raise TypeError(f'Unknown error code {_error}')
         _CUSTOM_ERROR_EXCEPTIONS[_error] = _exception
-
-
-class UnauthorizedSteamRequestError(Exception):
-    ...
-
-
-class TooManySteamRequestsError(Exception):
-    ...
