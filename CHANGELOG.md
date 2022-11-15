@@ -1,6 +1,6 @@
 # Pysteamauth changelog
 
-## [v0.0.8 (2022-10-02)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.8)
+## [v0.0.8 (2022-11-15)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.8)
 
 - Removed default value for domain parameter in cookie storage
 
