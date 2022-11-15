@@ -14,7 +14,7 @@ class BaseCookieStorage(CookieStorageAbstract):
     async def set(self, login: str, cookies: Mapping[str, Mapping[str, str]]) -> None:
         self.cookies[login] = cookies
 
-    async def get(self, login: str, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
+    async def get(self, login: str, domain: str) -> Mapping[str, str]:
         cookies = self.cookies.get(login)
         if not cookies:
             return {}

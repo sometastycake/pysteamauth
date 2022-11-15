@@ -1,6 +1,6 @@
 # Asynchronous python library for Steam authorization using protobuf
 
-[![pypi: package](https://img.shields.io/badge/pypi-0.0.7-blue)](https://pypi.org/project/pysteamauth/)
+[![pypi: package](https://img.shields.io/badge/pypi-0.0.8-blue)](https://pypi.org/project/pysteamauth/)
 [![Imports: isort](https://img.shields.io/badge/imports-isort-success)](https://pycqa.github.io/isort/)
 [![Linter: flake8](https://img.shields.io/badge/linter-flake8-success)](https://github.com/PyCQA/flake8)
 [![Mypy: checked](https://img.shields.io/badge/mypy-checked-success)](https://github.com/python/mypy)
@@ -27,7 +27,7 @@ async def main():
     steam = Steam(
         login='login', 
         password='password',
-        steamid=123456789,
+        steamid=76561111111111111,
     )
     
     await steam.login_to_steam()
@@ -51,7 +51,7 @@ from pysteamauth.auth import Steam, AuthenticatorData
 steam = Steam(
     login='login',
     password='password',
-    steamid=123456789,
+    steamid=76561111111111111,
     authenticator=AuthenticatorData(
         shared_secret='shared_secret',
         device_id='device_id',
@@ -82,7 +82,7 @@ class RedisStorage(CookieStorageAbstract):
     async def set(self, login: str, cookies: Dict) -> None:
         await self.redis.set(login, json.dumps(cookies))
 
-    async def get(self, login: str, domain: str = 'steamcommunity.com') -> Dict:
+    async def get(self, login: str, domain: str) -> Dict:
         cookies = await self.redis.get(login)
         if not cookies:
             return {}
@@ -93,7 +93,7 @@ async def main():
     steam = Steam(
         login='login',
         password='password',
-        steamid=123456789,
+        steamid=76561111111111111,
         cookie_storage=RedisStorage,
     )
     
@@ -116,7 +116,7 @@ from pysteamauth.errors import SteamError
 
 async def main():
     try:
-        await Steam('login', 'password', 123456789).login_to_steam()
+        await Steam('login', 'password', 76561111111111111).login_to_steam()
     except SteamError as error:
         print(error)
 
@@ -151,7 +151,7 @@ custom_error_exception({
 
 async def main():
     try:
-        await Steam('login', 'password', 123456789).login_to_steam()
+        await Steam('login', 'password', 76561111111111111).login_to_steam()
     except LoginError as error:
         print(error)
 
