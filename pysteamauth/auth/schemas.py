@@ -6,12 +6,6 @@ from typing import (
 from pydantic import BaseModel
 
 
-class AuthenticatorData(BaseModel):
-    shared_secret: str
-    identity_secret: str
-    device_id: str
-
-
 class Params(BaseModel):
     nonce: str
     auth: str

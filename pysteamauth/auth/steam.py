@@ -38,7 +38,6 @@ from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
 )
 
 from .schemas import (
-    AuthenticatorData,
     FinalizeLoginStatus,
     ServerTimeResponse,
     SteamAuthorizationStatus,
@@ -58,25 +57,25 @@ class Steam:
         self,
         login: str,
         password: str,
-        steamid: int,
-        authenticator: Optional[AuthenticatorData] = None,
+        steamid: Optional[int] = None,
+        shared_secret: Optional[str] = None,
+        identity_secret: Optional[str] = None,
+        device_id: Optional[str] = None,
         cookie_storage: Type[CookieStorageAbstract] = BaseCookieStorage,
         request_strategy: Type[RequestStrategyAbstract] = BaseRequestStrategy,
     ):
         self._login = login
         self._steamid = steamid
         self._password = password
-        self._authenticator = authenticator
+        self._shared_secret = shared_secret
+        self._identity_secret = identity_secret
+        self._device_id = device_id
         self._http = request_strategy()
         self._storage = cookie_storage()
 
     @property
     def steamid(self) -> int:
         return self._steamid
-
-    @property
-    def authenticator(self) -> Optional[AuthenticatorData]:
-        return self._authenticator
 
     @property
     def login(self) -> str:
@@ -183,12 +182,12 @@ class Steam:
         """
         Calculating Steam Guard code.
         """
-        if self._authenticator is None:
-            raise RuntimeError('Not found authenticator')
+        if not self._shared_secret:
+            raise ValueError('Require shared_secret, but it does not specified')
 
         data = binascii.unhexlify(
             hmac.new(
-                key=base64.b64decode(self._authenticator.shared_secret),
+                key=base64.b64decode(self._shared_secret),
                 msg=pack('!L', 0) + pack('!L', math.floor(server_time // 30)),
                 digestmod=hashlib.sha1,
             ).hexdigest(),
@@ -214,10 +213,10 @@ class Steam:
         """
         Get mobile confirmation hash.
         """
-        if self._authenticator is None:
-            raise RuntimeError('Not found authenticator')
+        if self._identity_secret is None:
+            raise ValueError('Require identity_secret, but it does not specified')
         identitysecret = base64.b64decode(
-            self._authenticator.identity_secret,
+            self._identity_secret,
         )
         secret = BitArray(
             bytes=identitysecret,
