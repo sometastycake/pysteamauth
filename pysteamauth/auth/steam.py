@@ -163,13 +163,11 @@ class Steam:
         )
         return ServerTimeResponse.parse_raw(response).response.server_time
 
-    async def get_steam_guard(self, server_time: int) -> str:
-        if not self._shared_secret:
-            raise ValueError('Require shared_secret, but it does not specified')
-
+    @classmethod
+    async def get_steam_guard(cls, shared_secret: str, server_time: int) -> str:
         data = binascii.unhexlify(
             hmac.new(
-                key=base64.b64decode(self._shared_secret),
+                key=base64.b64decode(shared_secret),
                 msg=pack('!L', 0) + pack('!L', math.floor(server_time // 30)),
                 digestmod=hashlib.sha1,
             ).hexdigest(),
@@ -317,8 +315,10 @@ class Steam:
         )
         if auth_session.allowed_confirmations:
             if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
+                if not self._shared_secret:
+                    raise ValueError('Require shared_secret, but it does not specified')
                 server_time = await self.get_server_time()
-                code = await self.get_steam_guard(server_time)
+                code = await Steam.get_steam_guard(self._shared_secret, server_time)
                 await self._update_auth_session(
                     client_id=auth_session.client_id,
                     steamid=auth_session.steamid,
