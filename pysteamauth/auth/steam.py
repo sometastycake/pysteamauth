@@ -91,9 +91,6 @@ class Steam:
         return (await self.cookies(domain))['sessionid']
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
-        """
-        Request with Steam session.
-        """
         domain = get_host_from_url(url)
 
         if domain not in self.domains:
@@ -115,18 +112,12 @@ class Steam:
         )
 
     async def is_authorized(self) -> bool:
-        """
-        Is alive authorization.
-        """
         response: str = await self.request(
             url='https://steamcommunity.com/chat/clientjstoken',
         )
         return SteamAuthorizationStatus.parse_raw(response).logged_in
 
     async def _getrsakey(self) -> CAuthentication_GetPasswordRSAPublicKey_Response:
-        """
-        Get rsa keys for password encryption.
-        """
         message = CAuthentication_GetPasswordRSAPublicKey_Request(
             account_name=self._login,
         )
@@ -144,9 +135,6 @@ class Steam:
             encrypted_password: str,
             rsa_timestamp: int,
     ) -> CAuthentication_BeginAuthSessionViaCredentials_Response:
-        """
-        Begin auth session.
-        """
         message = CAuthentication_BeginAuthSessionViaCredentials_Request(
             account_name=self._login,
             encrypted_password=encrypted_password,
@@ -169,9 +157,6 @@ class Steam:
         return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
 
     async def get_server_time(self) -> int:
-        """
-        Get server time.
-        """
         response = await self._http.text(
             method='POST',
             url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
@@ -179,9 +164,6 @@ class Steam:
         return ServerTimeResponse.parse_raw(response).response.server_time
 
     async def get_steam_guard(self, server_time: int) -> str:
-        """
-        Calculating Steam Guard code.
-        """
         if not self._shared_secret:
             raise ValueError('Require shared_secret, but it does not specified')
 
@@ -210,9 +192,6 @@ class Steam:
         return code
 
     def get_confirmation_hash(self, server_time: int, tag: str = 'conf') -> str:
-        """
-        Get mobile confirmation hash.
-        """
         if self._identity_secret is None:
             raise ValueError('Require identity_secret, but it does not specified')
         identitysecret = base64.b64decode(
@@ -237,9 +216,6 @@ class Steam:
         return str(base64.b64encode(confirmation.digest()), 'utf8')
 
     def _encrypt_password(self, keys: CAuthentication_GetPasswordRSAPublicKey_Response) -> str:
-        """
-        Encrypt password.
-        """
         publickey_exp = int(keys.publickey_exp, 16)  # type:ignore
         publickey_mod = int(keys.publickey_mod, 16)  # type:ignore
         public_key = rsa.PublicKey(
@@ -259,9 +235,6 @@ class Steam:
             code: str,
             code_type: int,
     ) -> None:
-        """
-        Update session request.
-        """
         message = CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
             client_id=client_id,
             steamid=steamid,
@@ -283,9 +256,6 @@ class Steam:
             client_id: int,
             request_id: bytes,
     ) -> CAuthentication_PollAuthSessionStatus_Response:
-        """
-        Auth session status.
-        """
         message = CAuthentication_PollAuthSessionStatus_Request(
             client_id=client_id,
             request_id=request_id,
@@ -302,9 +272,6 @@ class Steam:
         return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
     async def _finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
-        """
-        Finalize login.
-        """
         response = await self._http.text(
             method='POST',
             url='https://login.steampowered.com/jwt/finalizelogin',
@@ -319,9 +286,6 @@ class Steam:
         return FinalizeLoginStatus.parse_raw(response)
 
     async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> None:
-        """
-        Set token.
-        """
         await self._http.request(
             method='POST',
             url=url,
@@ -335,15 +299,9 @@ class Steam:
         )
 
     def _is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
-        """
-        Is twofactor required.
-        """
         return confirmation.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode
 
     async def login_to_steam(self) -> None:
-        """
-        Login to Steam.
-        """
         if await self.is_authorized():
             return
         if not self._http.cookies().get('sessionid'):
