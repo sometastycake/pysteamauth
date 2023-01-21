@@ -91,6 +91,10 @@ class Steam:
     def login(self) -> str:
         return self._login
 
+    @property
+    def partner_id(self) -> int:
+        return self.steamid - 76561197960265728
+
     async def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
         return await self._storage.get(
             login=self._login,
