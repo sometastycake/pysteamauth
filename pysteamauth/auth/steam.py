@@ -2,6 +2,7 @@ import base64
 import binascii
 import hashlib
 import hmac
+import json
 import math
 from struct import pack
 from typing import (
@@ -39,7 +40,6 @@ from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
 
 from .schemas import (
     FinalizeLoginStatus,
-    ServerTimeResponse,
     SteamAuthorizationStatus,
 )
 from .utils import get_host_from_url
@@ -161,7 +161,8 @@ class Steam:
             method='POST',
             url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
         )
-        return ServerTimeResponse.parse_raw(response).response.server_time
+        data = json.loads(response)
+        return int(data['response']['server_time'])
 
     @classmethod
     async def get_steam_guard(cls, shared_secret: str, server_time: int) -> str:
