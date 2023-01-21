@@ -198,10 +198,8 @@ class Steam:
         return code
 
     def get_confirmation_hash(self, server_time: int, tag: str = 'conf') -> str:
-        if self._identity_secret is None:
-            raise ValueError('Require identity_secret, but it does not specified')
         identitysecret = base64.b64decode(
-            self._identity_secret,
+            self.identity_secret,
         )
         secret = BitArray(
             bytes=identitysecret,
@@ -323,10 +321,8 @@ class Steam:
         )
         if auth_session.allowed_confirmations:
             if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
-                if not self._shared_secret:
-                    raise ValueError('Require shared_secret, but it does not specified')
                 server_time = await self.get_server_time()
-                code = await Steam.get_steam_guard(self._shared_secret, server_time)
+                code = await Steam.get_steam_guard(self.shared_secret, server_time)
                 await self._update_auth_session(
                     client_id=auth_session.client_id,
                     steamid=auth_session.steamid,
@@ -339,7 +335,7 @@ class Steam:
         )
         tokens = await self._finalize_login(
             refresh_token=session.refresh_token,
-            sessionid=await self.sessionid(),
+            sessionid=self._requests.cookies().get('sessionid'),
         )
         for token in tokens.transfer_info:
             await self._set_token(
