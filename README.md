@@ -18,8 +18,6 @@ pip install pysteamauth
 ## Usage
 
 ```python
-import asyncio
-
 from pysteamauth.auth import Steam
 
 
@@ -27,36 +25,24 @@ async def main():
     steam = Steam(
         login='login', 
         password='password',
-        steamid=76561111111111111,
     )
     
     await steam.login_to_steam()
 
-    result: bool = await steam.is_authorized()
-
     await steam.request('https://steamcommunity.com')
     await steam.request('https://store.steampowered.com')
     await steam.request('https://help.steampowered.com')
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
 ```
 
 ## If account have Steam Guard
 
 ```python
-from pysteamauth.auth import Steam, AuthenticatorData
+from pysteamauth.auth import Steam
 
 steam = Steam(
     login='login',
     password='password',
-    steamid=76561111111111111,
-    authenticator=AuthenticatorData(
-        shared_secret='shared_secret',
-        device_id='device_id',
-        identity_secret='identity_secret',
-    )
+    shared_secret='shared_secret',
 )
 ```
 
@@ -66,7 +52,6 @@ Library uses default cookie storage `BaseCookieStorage`, which stores Steam cook
 But you can write own cookie storage. For example, redis storage:
 
 ```python
-import asyncio
 import json
 from typing import Dict
 
@@ -93,43 +78,29 @@ async def main():
     steam = Steam(
         login='login',
         password='password',
-        steamid=76561111111111111,
-        cookie_storage=RedisStorage,
+        cookie_storage=RedisStorage(),
     )
     
     await steam.login_to_steam()
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
-
 ```
 
 ## Error processing
 
 ```python
-import asyncio
-
 from pysteamauth.auth import Steam
 from pysteamauth.errors import SteamError
 
 
 async def main():
     try:
-        await Steam('login', 'password', 76561111111111111).login_to_steam()
+        await Steam('login', 'password').login_to_steam()
     except SteamError as error:
         print(error)
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
 ```
 
 #### Or
 
 ```python
-import asyncio
-
 from pysteamauth.auth import Steam
 from pysteamauth.errors import SteamError, custom_error_exception
 
@@ -142,7 +113,6 @@ class RateLimitExceeded(SteamError):
     ...
 
 
-# Error codes are stored in pysteamauth.errors
 custom_error_exception({
     5: LoginError,
     84: RateLimitExceeded,
@@ -151,13 +121,9 @@ custom_error_exception({
 
 async def main():
     try:
-        await Steam('login', 'password', 76561111111111111).login_to_steam()
+        await Steam('login', 'password').login_to_steam()
     except LoginError as error:
         print(error)
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
 ```
 
 #### Output
@@ -169,3 +135,7 @@ if __name__ == '__main__':
 - https://github.com/SteamDatabase/Protobufs/blob/master/steam/steammessages_base.proto
 - https://github.com/SteamDatabase/Protobufs/blob/master/steam/steammessages_auth.steamclient.proto
 - https://github.com/SteamDatabase/Protobufs/blob/master/steam/steammessages_unified_base.steamclient.proto
+
+## License
+
+MIT
