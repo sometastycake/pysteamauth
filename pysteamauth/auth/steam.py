@@ -69,7 +69,27 @@ class Steam:
 
     @property
     def steamid(self) -> int:
+        if not self._steamid:
+            raise ValueError('steamid is not specified')
         return self._steamid
+
+    @property
+    def shared_secret(self) -> str:
+        if not self._shared_secret:
+            raise ValueError('shared_secret is not specified')
+        return self._shared_secret
+
+    @property
+    def identity_secret(self) -> str:
+        if not self._identity_secret:
+            raise ValueError('identity_secret is not specified')
+        return self._identity_secret
+
+    @property
+    def device_id(self) -> str:
+        if not self._device_id:
+            raise ValueError('device_id is not specified')
+        return self._device_id
 
     @property
     def login(self) -> str:
