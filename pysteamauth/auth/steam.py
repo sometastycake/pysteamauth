@@ -321,9 +321,8 @@ class Steam:
         )
         tokens = await self._finalize_login(
             refresh_token=session.refresh_token,
-            sessionid=self._http.cookies()['sessionid'],
+            sessionid=await self.sessionid(),
         )
-
         for token in tokens.transfer_info:
             await self._set_token(
                 url=token.url,
@@ -331,15 +330,12 @@ class Steam:
                 auth=token.params.auth,
                 steamid=auth_session.steamid,
             )
-        # Needs to get additional cookies through aiohttp session
-        for domain in ('store', 'help'):
-            await self._http.bytes(
-                method='GET',
-                url=f'https://{domain}.steampowered.com',
-            )
-        # Write cookies from aiohttp session
-        cookies = {}
-        for domain in self.domains:
-            cookies[domain] = self._http.cookies(domain)
-        # Save cookies to storage
+        cookies = {
+            'steamcommunity.com': self._http.cookies('steamcommunity.com'),
+        }
+        for url in ('https://store.steampowered.com', 'https://help.steampowered.com'):
+            await self._http.bytes(url, 'GET')
+            cookies.update({
+                parse_url(url).host: self._http.cookies(parse_url(url).host)
+            })
         await self._storage.set(login=self._login, cookies=cookies)
