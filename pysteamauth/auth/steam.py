@@ -121,7 +121,14 @@ class Steam:
             url='https://steamcommunity.com/chat/clientjstoken',
         )
         data = json.loads(response)
-        return data['logged_in']
+        logged_in = data['logged_in']
+        if logged_in:
+            if not self._steamid:
+                try:
+                    self._steamid = int(data['steamid'])
+                except KeyError:
+                    ...
+        return logged_in
 
     async def _getrsakey(self) -> CAuthentication_GetPasswordRSAPublicKey_Response:
         message = CAuthentication_GetPasswordRSAPublicKey_Request(
@@ -343,6 +350,8 @@ class Steam:
                 auth=token.params.auth,
                 steamid=auth_session.steamid,
             )
+        if not self._steamid and tokens.steamID:
+            self._steamid = int(tokens.steamID)
         cookies = {
             'steamcommunity.com': self._requests.cookies('steamcommunity.com'),
         }
