@@ -1,7 +1,9 @@
 import base64
+import binascii
 import hashlib
 import hmac
 import json
+import math
 from struct import pack
 from typing import (
     Any,
@@ -9,8 +11,6 @@ from typing import (
     Optional,
 )
 
-import binascii
-import math
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
@@ -37,10 +37,8 @@ from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     EAuthSessionGuardType,
     EAuthTokenPlatformType,
 )
-from .schemas import (
-    FinalizeLoginStatus,
-    SteamAuthorizationStatus,
-)
+
+from .schemas import FinalizeLoginStatus
 
 
 class Steam:
@@ -122,7 +120,8 @@ class Steam:
         response: str = await self.request(
             url='https://steamcommunity.com/chat/clientjstoken',
         )
-        return SteamAuthorizationStatus.parse_raw(response).logged_in
+        data = json.loads(response)
+        return data['logged_in']
 
     async def _getrsakey(self) -> CAuthentication_GetPasswordRSAPublicKey_Response:
         message = CAuthentication_GetPasswordRSAPublicKey_Request(

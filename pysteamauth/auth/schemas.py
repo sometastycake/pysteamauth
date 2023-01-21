@@ -1,7 +1,4 @@
-from typing import (
-    List,
-    Optional,
-)
+from typing import List
 
 from pydantic import BaseModel
 
@@ -21,11 +18,3 @@ class FinalizeLoginStatus(BaseModel):
     redir: str
     transfer_info: List[TransferInfoItem]
     primary_domain: str
-
-
-class SteamAuthorizationStatus(BaseModel):
-    logged_in: bool
-    steamid: str
-    accountid: int
-    account_name: str
-    token: Optional[str]
