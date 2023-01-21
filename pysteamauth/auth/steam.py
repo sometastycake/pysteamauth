@@ -15,6 +15,7 @@ from typing import (
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
+from urllib3.util import parse_url
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
@@ -42,16 +43,9 @@ from .schemas import (
     FinalizeLoginStatus,
     SteamAuthorizationStatus,
 )
-from .utils import get_host_from_url
 
 
 class Steam:
-
-    domains = (
-        'steamcommunity.com',
-        'store.steampowered.com',
-        'help.steampowered.com',
-    )
 
     def __init__(
         self,
@@ -91,14 +85,9 @@ class Steam:
         return (await self.cookies(domain))['sessionid']
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
-        domain = get_host_from_url(url)
-
-        if domain not in self.domains:
-            raise RuntimeError(f'Wrong domain "{domain}"')
-
         cookies = await self._storage.get(
             login=self._login,
-            domain=domain,
+            domain=parse_url(url).host,
         )
 
         return await self._http.text(
