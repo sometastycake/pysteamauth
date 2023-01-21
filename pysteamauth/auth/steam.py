@@ -109,7 +109,6 @@ class Steam:
             login=self._login,
             domain=parse_url(url).host,
         )
-
         return await self._requests.text(
             url=url,
             method=method,
@@ -345,7 +344,7 @@ class Steam:
         )
         tokens = await self._finalize_login(
             refresh_token=session.refresh_token,
-            sessionid=self._requests.cookies().get('sessionid'),
+            sessionid=self._requests.cookies()['sessionid'],
         )
         for token in tokens.transfer_info:
             await self._set_token(
