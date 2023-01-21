@@ -1,17 +1,16 @@
 import base64
-import binascii
 import hashlib
 import hmac
 import json
-import math
 from struct import pack
 from typing import (
     Any,
     Mapping,
     Optional,
-    Type,
 )
 
+import binascii
+import math
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
@@ -38,7 +37,6 @@ from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
     EAuthSessionGuardType,
     EAuthTokenPlatformType,
 )
-
 from .schemas import (
     FinalizeLoginStatus,
     SteamAuthorizationStatus,
@@ -55,8 +53,8 @@ class Steam:
         shared_secret: Optional[str] = None,
         identity_secret: Optional[str] = None,
         device_id: Optional[str] = None,
-        cookie_storage: Type[CookieStorageAbstract] = BaseCookieStorage,
-        request_strategy: Type[RequestStrategyAbstract] = BaseRequestStrategy,
+        cookie_storage: Optional[CookieStorageAbstract] = None,
+        request_strategy: Optional[RequestStrategyAbstract] = None,
     ):
         self._login = login
         self._steamid = steamid
@@ -64,8 +62,8 @@ class Steam:
         self._shared_secret = shared_secret
         self._identity_secret = identity_secret
         self._device_id = device_id
-        self._http = request_strategy()
-        self._storage = cookie_storage()
+        self._http = request_strategy if request_strategy is not None else BaseRequestStrategy()
+        self._storage = cookie_storage if cookie_storage is not None else BaseCookieStorage()
 
     @property
     def steamid(self) -> int:
