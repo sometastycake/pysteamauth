@@ -62,7 +62,7 @@ class Steam:
         self._shared_secret = shared_secret
         self._identity_secret = identity_secret
         self._device_id = device_id
-        self._http = request_strategy if request_strategy is not None else BaseRequestStrategy()
+        self._requests = request_strategy if request_strategy is not None else BaseRequestStrategy()
         self._storage = cookie_storage if cookie_storage is not None else BaseCookieStorage()
 
     @property
@@ -108,7 +108,7 @@ class Steam:
             domain=parse_url(url).host,
         )
 
-        return await self._http.text(
+        return await self._requests.text(
             url=url,
             method=method,
             cookies={
@@ -128,7 +128,7 @@ class Steam:
         message = CAuthentication_GetPasswordRSAPublicKey_Request(
             account_name=self._login,
         )
-        response = await self._http.bytes(
+        response = await self._requests.bytes(
             method='GET',
             url='https://api.steampowered.com/IAuthenticationService/GetPasswordRSAPublicKey/v1',
             params={
@@ -152,7 +152,7 @@ class Steam:
             persistence=ESessionPersistence.k_ESessionPersistence_Persistent,
             device_friendly_name='Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8',
         )
-        response = await self._http.bytes(
+        response = await self._requests.bytes(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/BeginAuthSessionViaCredentials/v1',
             data=FormData(
@@ -164,7 +164,7 @@ class Steam:
         return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
 
     async def get_server_time(self) -> int:
-        response = await self._http.text(
+        response = await self._requests.text(
             method='POST',
             url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
         )
@@ -247,7 +247,7 @@ class Steam:
             code=code,
             code_type=code_type,
         )
-        await self._http.request(
+        await self._requests.request(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithSteamGuardCode/v1',
             data=FormData(
@@ -266,7 +266,7 @@ class Steam:
             client_id=client_id,
             request_id=request_id,
         )
-        response = await self._http.bytes(
+        response = await self._requests.bytes(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/PollAuthSessionStatus/v1',
             data=FormData(
@@ -278,7 +278,7 @@ class Steam:
         return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
     async def _finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
-        response = await self._http.text(
+        response = await self._requests.text(
             method='POST',
             url='https://login.steampowered.com/jwt/finalizelogin',
             data=FormData(
@@ -292,7 +292,7 @@ class Steam:
         return FinalizeLoginStatus.parse_raw(response)
 
     async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> None:
-        await self._http.request(
+        await self._requests.request(
             method='POST',
             url=url,
             data=FormData(
@@ -310,8 +310,8 @@ class Steam:
     async def login_to_steam(self) -> None:
         if await self.is_authorized():
             return
-        if not self._http.cookies().get('sessionid'):
-            await self._http.bytes(
+        if not self._requests.cookies().get('sessionid'):
+            await self._requests.bytes(
                 method='GET',
                 url='https://steamcommunity.com',
             )
@@ -349,11 +349,11 @@ class Steam:
                 steamid=auth_session.steamid,
             )
         cookies = {
-            'steamcommunity.com': self._http.cookies('steamcommunity.com'),
+            'steamcommunity.com': self._requests.cookies('steamcommunity.com'),
         }
         for url in ('https://store.steampowered.com', 'https://help.steampowered.com'):
-            await self._http.bytes(url, 'GET')
+            await self._requests.bytes(url, 'GET')
             cookies.update({
-                parse_url(url).host: self._http.cookies(parse_url(url).host)
+                parse_url(url).host: self._requests.cookies(parse_url(url).host)
             })
         await self._storage.set(login=self._login, cookies=cookies)
