@@ -358,6 +358,6 @@ class Steam:
         for url in ('https://store.steampowered.com', 'https://help.steampowered.com'):
             await self._requests.bytes(url, 'GET')
             cookies.update({
-                parse_url(url).host: self._requests.cookies(parse_url(url).host)
+                parse_url(url).host: self._requests.cookies(parse_url(url).host),
             })
         await self._storage.set(login=self._login, cookies=cookies)
