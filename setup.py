@@ -8,12 +8,13 @@ requirements = [
     'pydantic>=1.5',
     'rsa>=4.0',
     'bitstring>=3.1.2',
+    'urllib3>=1.26.14',
 ]
 
 
 setup(
     name='pysteamauth',
-    version='0.0.8',
+    version='1.0.0',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',

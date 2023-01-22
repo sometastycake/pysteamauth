@@ -1,8 +1,20 @@
-# Pysteamauth changelog
+# Changelog
+
+## [v1.0.0 (2023-01-22)](https://github.com/sometastycake/pysteamauth/releases/tag/v1.0.0)
+
+- `get_steam_guard` method is classmethod now
+- Removed docstrings
+- Added new properties to Steam class
+- Removed `AuthenticatorData` schema
+- Removed `SteamAuthorizationStatus` schema
+- Removed `ServerTimeResponse` schema
+- Removed `get_host_from_url` function
+- Initialize `steamid` if it doesn't specify
+- Steam class now accepts objects of `BaseRequestStrategy` and `BaseCookieStorage`
 
 ## [v0.0.8 (2022-11-15)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.8)
 
-- Removed default value for domain parameter in cookie storage
+- Removed default value for `domain` parameter in cookie storage
 
 ## [v0.0.7 (2022-10-02)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.7)
 
@@ -10,7 +22,7 @@
 
 ## [v0.0.6 (2022-09-28)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.6)
 
-- Fixed check_http_status method
+- Fixed `check_http_status` method
 
 ## [v0.0.5 (2022-09-25)](https://github.com/sometastycake/pysteamauth/releases/tag/v0.0.5)
 
