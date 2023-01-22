@@ -8,6 +8,7 @@ requirements = [
     'pydantic>=1.5',
     'rsa>=4.0',
     'bitstring>=3.1.2',
+    'urllib3>=1.26.14',
 ]
 
 
