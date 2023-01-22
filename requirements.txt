@@ -1,0 +1,17 @@
+aiohttp
+aiosignal
+async-timeout
+asynctest
+attrs
+bitstring
+charset-normalizer
+frozenlist
+idna==3.4
+multidict
+protobuf
+pyasn1
+pydantic
+rsa
+typing_extensions
+urllib3
+yarl
