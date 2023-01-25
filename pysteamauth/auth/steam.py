@@ -1,6 +1,4 @@
 import base64
-
-import aiohttp
 import binascii
 import hashlib
 import hmac
@@ -9,10 +7,13 @@ import math
 from struct import pack
 from typing import (
     Any,
+    Dict,
     Mapping,
-    Optional, Dict,
+    Optional,
+    Union,
 )
 
+import aiohttp
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
@@ -29,6 +30,8 @@ from pysteamauth.base import (
 )
 from pysteamauth.pb.enums_pb2 import ESessionPersistence
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
+    CAuthentication_AccessToken_GenerateForApp_Request,
+    CAuthentication_AccessToken_GenerateForApp_Response,
     CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
     CAuthentication_BeginAuthSessionViaCredentials_Response,
@@ -38,11 +41,13 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_PollAuthSessionStatus_Response,
     CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
     EAuthSessionGuardType,
-    EAuthTokenPlatformType, CAuthentication_AccessToken_GenerateForApp_Response,
-    CAuthentication_AccessToken_GenerateForApp_Request,
+    EAuthTokenPlatformType,
 )
 
-from .schemas import FinalizeLoginStatus
+from .schemas import (
+    EnumerateTokensModel,
+    FinalizeLoginStatus,
+)
 
 
 def pbmessage_to_request(msg: Message) -> str:
@@ -137,14 +142,20 @@ class BaseSteam:
             ),
         )
 
-    async def enumerate_tokens(self, access_key: str) -> Dict:
-        response = await self._requests.bytes(
+    async def enumerate_tokens(
+            self,
+            access_key: str,
+            return_model: bool = False,
+    ) -> Union[Dict, EnumerateTokensModel]:
+        response = await self._requests.text(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/EnumerateTokens/v1',
             params={
                 'access_token': access_key,
             }
         )
+        if return_model:
+            return EnumerateTokensModel.parse_raw(response)
         return json.loads(response)
 
 
