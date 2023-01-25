@@ -24,8 +24,8 @@ from pysteamauth.base import (
     BaseCookieStorage,
     BaseRequestStrategy,
 )
-from pysteamauth.pb2.enums_pb2 import ESessionPersistence
-from pysteamauth.pb2.steammessages_auth.steamclient_pb2 import (
+from pysteamauth.pb.enums_pb2 import ESessionPersistence
+from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
     CAuthentication_BeginAuthSessionViaCredentials_Response,
@@ -246,7 +246,7 @@ class Steam:
             client_id: int,
             steamid: int,
             code: str,
-            code_type: int,
+            code_type: EAuthSessionGuardType,
     ) -> None:
         message = CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
             client_id=client_id,
