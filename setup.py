@@ -22,7 +22,7 @@ setup(
     description='Asynchronous python library for Steam authorization using protobuf',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['proto']),
     zip_safe=False,
     python_requires='>=3.7',
     install_requires=requirements,
