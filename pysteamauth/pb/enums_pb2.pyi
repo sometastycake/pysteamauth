@@ -1,0 +1,428 @@
+from typing import ClassVar as _ClassVar
+
+from google.protobuf import descriptor as _descriptor
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+
+import pysteamauth.pb.steammessages_base_pb2 as _steammessages_base_pb2
+
+
+DESCRIPTOR: _descriptor.FileDescriptor
+k_BluetoothDeviceType_Computer: EBluetoothDeviceType
+k_BluetoothDeviceType_Gamepad: EBluetoothDeviceType
+k_BluetoothDeviceType_Headphones: EBluetoothDeviceType
+k_BluetoothDeviceType_Headset: EBluetoothDeviceType
+k_BluetoothDeviceType_Invalid: EBluetoothDeviceType
+k_BluetoothDeviceType_Joystick: EBluetoothDeviceType
+k_BluetoothDeviceType_Keyboard: EBluetoothDeviceType
+k_BluetoothDeviceType_Mouse: EBluetoothDeviceType
+k_BluetoothDeviceType_OtherAudio: EBluetoothDeviceType
+k_BluetoothDeviceType_Phone: EBluetoothDeviceType
+k_BluetoothDeviceType_Speakers: EBluetoothDeviceType
+k_BluetoothDeviceType_Unknown: EBluetoothDeviceType
+k_EACState_Connected: EACState
+k_EACState_ConnectedSlow: EACState
+k_EACState_Disconnected: EACState
+k_EACState_Unknown: EACState
+k_EBatteryState_Charging: EBatteryState
+k_EBatteryState_Discharging: EBatteryState
+k_EBatteryState_Full: EBatteryState
+k_EBatteryState_Unknown: EBatteryState
+k_ECPUGovernor_Invalid: ECPUGovernor
+k_ECPUGovernor_Manual: ECPUGovernor
+k_ECPUGovernor_Perf: ECPUGovernor
+k_ECPUGovernor_Powersave: ECPUGovernor
+k_ECloudStoragePersistStateDeleted: ECloudStoragePersistState
+k_ECloudStoragePersistStateForgotten: ECloudStoragePersistState
+k_ECloudStoragePersistStatePersisted: ECloudStoragePersistState
+k_EColorProfile_Invalid: EColorProfile
+k_EColorProfile_Native: EColorProfile
+k_EColorProfile_Standard: EColorProfile
+k_EColorProfile_Vivid: EColorProfile
+k_ECommunityItemClass_AnimatedAvatar: ECommunityItemClass
+k_ECommunityItemClass_AvatarFrame: ECommunityItemClass
+k_ECommunityItemClass_Badge: ECommunityItemClass
+k_ECommunityItemClass_BoosterPack: ECommunityItemClass
+k_ECommunityItemClass_ChatEffect: ECommunityItemClass
+k_ECommunityItemClass_Consumable: ECommunityItemClass
+k_ECommunityItemClass_Emoticon: ECommunityItemClass
+k_ECommunityItemClass_GameCard: ECommunityItemClass
+k_ECommunityItemClass_GameGoo: ECommunityItemClass
+k_ECommunityItemClass_Invalid: ECommunityItemClass
+k_ECommunityItemClass_MiniProfileBackground: ECommunityItemClass
+k_ECommunityItemClass_ProfileBackground: ECommunityItemClass
+k_ECommunityItemClass_ProfileModifier: ECommunityItemClass
+k_ECommunityItemClass_SalienItem: ECommunityItemClass
+k_ECommunityItemClass_Scene: ECommunityItemClass
+k_ECommunityItemClass_SteamDeckKeyboardSkin: ECommunityItemClass
+k_ECommunityItemClass_SteamDeckStartupMovie: ECommunityItemClass
+k_ECommunityItemClass_Sticker: ECommunityItemClass
+k_EContentCheckProvider_Amazon: EContentCheckProvider
+k_EContentCheckProvider_Google: EContentCheckProvider
+k_EContentCheckProvider_Invalid: EContentCheckProvider
+k_EContentCheckProvider_Local: EContentCheckProvider
+k_EGPUPerformanceLevel_Auto: EGPUPerformanceLevel
+k_EGPUPerformanceLevel_High: EGPUPerformanceLevel
+k_EGPUPerformanceLevel_Invalid: EGPUPerformanceLevel
+k_EGPUPerformanceLevel_Low: EGPUPerformanceLevel
+k_EGPUPerformanceLevel_Manual: EGPUPerformanceLevel
+k_EGPUPerformanceLevel_Profiling: EGPUPerformanceLevel
+k_EGraphicsPerfOverlayLevel_Basic: EGraphicsPerfOverlayLevel
+k_EGraphicsPerfOverlayLevel_Full: EGraphicsPerfOverlayLevel
+k_EGraphicsPerfOverlayLevel_Hidden: EGraphicsPerfOverlayLevel
+k_EGraphicsPerfOverlayLevel_Medium: EGraphicsPerfOverlayLevel
+k_EGraphicsPerfOverlayLevel_Minimal: EGraphicsPerfOverlayLevel
+k_ENewSteamAnnouncementState_AllRead: ENewSteamAnnouncementState
+k_ENewSteamAnnouncementState_FeaturedAnnouncement: ENewSteamAnnouncementState
+k_ENewSteamAnnouncementState_Invalid: ENewSteamAnnouncementState
+k_ENewSteamAnnouncementState_NewAnnouncement: ENewSteamAnnouncementState
+k_EOSBranch_Beta: EOSBranch
+k_EOSBranch_BetaCandidate: EOSBranch
+k_EOSBranch_Main: EOSBranch
+k_EOSBranch_Release: EOSBranch
+k_EOSBranch_ReleaseCandidate: EOSBranch
+k_EOSBranch_Staging: EOSBranch
+k_EOSBranch_Unknown: EOSBranch
+k_EPersonaStateFlag_ClientTypeMobile: EPersonaStateFlag
+k_EPersonaStateFlag_ClientTypeTenfoot: EPersonaStateFlag
+k_EPersonaStateFlag_ClientTypeVR: EPersonaStateFlag
+k_EPersonaStateFlag_ClientTypeWeb: EPersonaStateFlag
+k_EPersonaStateFlag_Golden: EPersonaStateFlag
+k_EPersonaStateFlag_HasRichPresence: EPersonaStateFlag
+k_EPersonaStateFlag_InJoinableGame: EPersonaStateFlag
+k_EPersonaStateFlag_LaunchTypeCompatTool: EPersonaStateFlag
+k_EPersonaStateFlag_LaunchTypeGamepad: EPersonaStateFlag
+k_EPersonaStateFlag_RemotePlayTogether: EPersonaStateFlag
+k_EProfileCustomizationTypeAchievements: EProfileCustomizationType
+k_EProfileCustomizationTypeAchievementsCompletionist: EProfileCustomizationType
+k_EProfileCustomizationTypeArtworkShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeBadges: EProfileCustomizationType
+k_EProfileCustomizationTypeCustomText: EProfileCustomizationType
+k_EProfileCustomizationTypeFavoriteGame: EProfileCustomizationType
+k_EProfileCustomizationTypeFavoriteGroup: EProfileCustomizationType
+k_EProfileCustomizationTypeGameCollector: EProfileCustomizationType
+k_EProfileCustomizationTypeGreenlight: EProfileCustomizationType
+k_EProfileCustomizationTypeGuides: EProfileCustomizationType
+k_EProfileCustomizationTypeInvalid: EProfileCustomizationType
+k_EProfileCustomizationTypeItemShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeLoyaltyRewardReactions: EProfileCustomizationType
+k_EProfileCustomizationTypeMyGreenlight: EProfileCustomizationType
+k_EProfileCustomizationTypeMyGuides: EProfileCustomizationType
+k_EProfileCustomizationTypeMyWorkshop: EProfileCustomizationType
+k_EProfileCustomizationTypeRareAchievementShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeRecommendation: EProfileCustomizationType
+k_EProfileCustomizationTypeSalien: EProfileCustomizationType
+k_EProfileCustomizationTypeScreenshotShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeSingleArtworkShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeTradeShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeVideoShowcase: EProfileCustomizationType
+k_EProfileCustomizationTypeWorkshopItem: EProfileCustomizationType
+k_EProvideDeckFeedbackPreference_No: EProvideDeckFeedbackPreference
+k_EProvideDeckFeedbackPreference_Unset: EProvideDeckFeedbackPreference
+k_EProvideDeckFeedbackPreference_Yes: EProvideDeckFeedbackPreference
+k_EPublishedFileInappropriateProvider_Amazon: EPublishedFileInappropriateProvider
+k_EPublishedFileInappropriateProvider_Google: EPublishedFileInappropriateProvider
+k_EPublishedFileInappropriateProvider_Invalid: EPublishedFileInappropriateProvider
+k_EPublishedFileInappropriateResult_Likely: EPublishedFileInappropriateResult
+k_EPublishedFileInappropriateResult_NotScanned: EPublishedFileInappropriateResult
+k_EPublishedFileInappropriateResult_Possible: EPublishedFileInappropriateResult
+k_EPublishedFileInappropriateResult_Unlikely: EPublishedFileInappropriateResult
+k_EPublishedFileInappropriateResult_VeryLikely: EPublishedFileInappropriateResult
+k_EPublishedFileInappropriateResult_VeryUnlikely: EPublishedFileInappropriateResult
+k_EPublishedFileStorageSystemDepot: EPublishedFileStorageSystem
+k_EPublishedFileStorageSystemInvalid: EPublishedFileStorageSystem
+k_EPublishedFileStorageSystemLegacyCloud: EPublishedFileStorageSystem
+k_EPublishedFileStorageSystemUGCCloud: EPublishedFileStorageSystem
+k_ESDCardFormatStage_Finalizing: ESDCardFormatStage
+k_ESDCardFormatStage_Formatting: ESDCardFormatStage
+k_ESDCardFormatStage_Invalid: ESDCardFormatStage
+k_ESDCardFormatStage_Rescuing: ESDCardFormatStage
+k_ESDCardFormatStage_Starting: ESDCardFormatStage
+k_ESDCardFormatStage_Testing: ESDCardFormatStage
+k_EScalingFilter_FSR: EScalingFilter
+k_EScalingFilter_Integer: EScalingFilter
+k_EScalingFilter_Invalid: EScalingFilter
+k_EScalingFilter_Linear: EScalingFilter
+k_EScalingFilter_NIS: EScalingFilter
+k_EScalingFilter_Nearest: EScalingFilter
+k_ESessionPersistence_Ephemeral: ESessionPersistence
+k_ESessionPersistence_Invalid: ESessionPersistence
+k_ESessionPersistence_Persistent: ESessionPersistence
+k_ESplitScalingFilter_FSR: ESplitScalingFilter
+k_ESplitScalingFilter_Invalid: ESplitScalingFilter
+k_ESplitScalingFilter_Linear: ESplitScalingFilter
+k_ESplitScalingFilter_NIS: ESplitScalingFilter
+k_ESplitScalingFilter_Nearest: ESplitScalingFilter
+k_ESplitScalingScaler_Auto: ESplitScalingScaler
+k_ESplitScalingScaler_Fill: ESplitScalingScaler
+k_ESplitScalingScaler_Fit: ESplitScalingScaler
+k_ESplitScalingScaler_Integer: ESplitScalingScaler
+k_ESplitScalingScaler_Invalid: ESplitScalingScaler
+k_ESplitScalingScaler_Stretch: ESplitScalingScaler
+k_ESteamDeckCompatibilityCategory_Playable: ESteamDeckCompatibilityCategory
+k_ESteamDeckCompatibilityCategory_Unknown: ESteamDeckCompatibilityCategory
+k_ESteamDeckCompatibilityCategory_Unsupported: ESteamDeckCompatibilityCategory
+k_ESteamDeckCompatibilityCategory_Verified: ESteamDeckCompatibilityCategory
+k_ESteamDeckCompatibilityFeedback_Agree: ESteamDeckCompatibilityFeedback
+k_ESteamDeckCompatibilityFeedback_Disagree: ESteamDeckCompatibilityFeedback
+k_ESteamDeckCompatibilityFeedback_Ignore: ESteamDeckCompatibilityFeedback
+k_ESteamDeckCompatibilityFeedback_Unset: ESteamDeckCompatibilityFeedback
+k_ESteamDeckCompatibilityResultDisplayType_Informational: ESteamDeckCompatibilityResultDisplayType
+k_ESteamDeckCompatibilityResultDisplayType_Invisible: ESteamDeckCompatibilityResultDisplayType
+k_ESteamDeckCompatibilityResultDisplayType_Playable: ESteamDeckCompatibilityResultDisplayType
+k_ESteamDeckCompatibilityResultDisplayType_Unsupported: ESteamDeckCompatibilityResultDisplayType
+k_ESteamDeckCompatibilityResultDisplayType_Verified: ESteamDeckCompatibilityResultDisplayType
+k_EStorageBlockContentType_Crypto: EStorageBlockContentType
+k_EStorageBlockContentType_FileSystem: EStorageBlockContentType
+k_EStorageBlockContentType_Invalid: EStorageBlockContentType
+k_EStorageBlockContentType_Raid: EStorageBlockContentType
+k_EStorageBlockContentType_Unknown: EStorageBlockContentType
+k_EStorageBlockFileSystemType_Ext4: EStorageBlockFileSystemType
+k_EStorageBlockFileSystemType_Invalid: EStorageBlockFileSystemType
+k_EStorageBlockFileSystemType_Unknown: EStorageBlockFileSystemType
+k_EStorageBlockFileSystemType_VFat: EStorageBlockFileSystemType
+k_EStorageDriveMediaType_HDD: EStorageDriveMediaType
+k_EStorageDriveMediaType_Invalid: EStorageDriveMediaType
+k_EStorageDriveMediaType_Removable: EStorageDriveMediaType
+k_EStorageDriveMediaType_SSD: EStorageDriveMediaType
+k_EStorageDriveMediaType_Unknown: EStorageDriveMediaType
+k_ESystemDisplayCompatibilityMode_Invalid: ESystemDisplayCompatibilityMode
+k_ESystemDisplayCompatibilityMode_MinimalBandwith: ESystemDisplayCompatibilityMode
+k_ESystemDisplayCompatibilityMode_None: ESystemDisplayCompatibilityMode
+k_ESystemServiceState_Disabled: ESystemServiceState
+k_ESystemServiceState_Enabled: ESystemServiceState
+k_ESystemServiceState_Unavailable: ESystemServiceState
+k_ETouchGestureDoubleTap: ETouchGesture
+k_ETouchGestureFlingCancelled: ETouchGesture
+k_ETouchGestureFlingStart: ETouchGesture
+k_ETouchGestureLongPress: ETouchGesture
+k_ETouchGestureLongTap: ETouchGesture
+k_ETouchGestureNone: ETouchGesture
+k_ETouchGesturePinchBegin: ETouchGesture
+k_ETouchGesturePinchEnd: ETouchGesture
+k_ETouchGesturePinchUpdate: ETouchGesture
+k_ETouchGestureShortPress: ETouchGesture
+k_ETouchGestureTap: ETouchGesture
+k_ETouchGestureTapCancelled: ETouchGesture
+k_ETouchGestureTouch: ETouchGesture
+k_ETouchGestureTwoFingerTap: ETouchGesture
+k_EUpdaterState_Applying: EUpdaterState
+k_EUpdaterState_Available: EUpdaterState
+k_EUpdaterState_Checking: EUpdaterState
+k_EUpdaterState_ClientRestartPending: EUpdaterState
+k_EUpdaterState_Invalid: EUpdaterState
+k_EUpdaterState_SystemRestartPending: EUpdaterState
+k_EUpdaterState_UpToDate: EUpdaterState
+k_EUpdaterType_Aggregated: EUpdaterType
+k_EUpdaterType_BIOS: EUpdaterType
+k_EUpdaterType_Client: EUpdaterType
+k_EUpdaterType_Dummy: EUpdaterType
+k_EUpdaterType_Invalid: EUpdaterType
+k_EUpdaterType_OS: EUpdaterType
+k_EUpdaterType_Test1: EUpdaterType
+k_EUpdaterType_Test2: EUpdaterType
+k_PublishedFileQueryType_AcceptedForGameRankedByAcceptanceDate: EPublishedFileQueryType
+k_PublishedFileQueryType_CreatedByFollowedUsersRankedByPublicationDate: EPublishedFileQueryType
+k_PublishedFileQueryType_CreatedByFriendsRankedByPublicationDate: EPublishedFileQueryType
+k_PublishedFileQueryType_FavoritedByFriendsRankedByPublicationDate: EPublishedFileQueryType
+k_PublishedFileQueryType_NotYetRated: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByAveragePlaytimeTrend: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByBanContentCheck: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByInappropriateContentRating: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByLastUpdatedDate: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByLifetimeAveragePlaytime: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByLifetimePlaytimeSessions: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByNumTimesReported: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByPlaytimeSessionsTrend: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByPlaytimeTrend: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByPublicationDate: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByTextSearch: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByTotalPlaytime: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByTotalUniqueSubscriptions: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByTotalVotesAsc: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByTrend: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByVote: EPublishedFileQueryType
+k_PublishedFileQueryType_RankedByVotesUp: EPublishedFileQueryType
+k_SystemAudioChannel_Aggregated: ESystemAudioChannel
+k_SystemAudioChannel_BackLeft: ESystemAudioChannel
+k_SystemAudioChannel_BackRight: ESystemAudioChannel
+k_SystemAudioChannel_FrontCenter: ESystemAudioChannel
+k_SystemAudioChannel_FrontLeft: ESystemAudioChannel
+k_SystemAudioChannel_FrontRight: ESystemAudioChannel
+k_SystemAudioChannel_Invalid: ESystemAudioChannel
+k_SystemAudioChannel_LFE: ESystemAudioChannel
+k_SystemAudioChannel_Mono: ESystemAudioChannel
+k_SystemAudioChannel_Unknown: ESystemAudioChannel
+k_SystemAudioDirection_Input: ESystemAudioDirection
+k_SystemAudioDirection_Invalid: ESystemAudioDirection
+k_SystemAudioDirection_Output: ESystemAudioDirection
+k_SystemAudioPortDirection_Input: ESystemAudioPortDirection
+k_SystemAudioPortDirection_Invalid: ESystemAudioPortDirection
+k_SystemAudioPortDirection_Output: ESystemAudioPortDirection
+k_SystemAudioPortType_Audio32f: ESystemAudioPortType
+k_SystemAudioPortType_Invalid: ESystemAudioPortType
+k_SystemAudioPortType_Midi8b: ESystemAudioPortType
+k_SystemAudioPortType_Unknown: ESystemAudioPortType
+k_SystemAudioPortType_Video32RGBA: ESystemAudioPortType
+k_SystemFanControlMode_Default: ESystemFanControlMode
+k_SystemFanControlMode_Disabled: ESystemFanControlMode
+k_SystemFanControlMode_Invalid: ESystemFanControlMode
+
+
+class EPublishedFileQueryType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EPublishedFileInappropriateProvider(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EPublishedFileInappropriateResult(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EPersonaStateFlag(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EContentCheckProvider(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EProfileCustomizationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EPublishedFileStorageSystem(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ECloudStoragePersistState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESDCardFormatStage(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemFanControlMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EColorProfile(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EBluetoothDeviceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemAudioDirection(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemAudioChannel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemAudioPortType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemAudioPortDirection(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemServiceState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EGraphicsPerfOverlayLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EGPUPerformanceLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EScalingFilter(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESplitScalingFilter(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESplitScalingScaler(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ECPUGovernor(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EUpdaterType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EUpdaterState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EStorageBlockContentType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EStorageBlockFileSystemType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EStorageDriveMediaType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESystemDisplayCompatibilityMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESteamDeckCompatibilityCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESteamDeckCompatibilityResultDisplayType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EACState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EBatteryState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EOSBranch(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ECommunityItemClass(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESteamDeckCompatibilityFeedback(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class EProvideDeckFeedbackPreference(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ETouchGesture(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ESessionPersistence(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+
+class ENewSteamAnnouncementState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
