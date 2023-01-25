@@ -13,9 +13,11 @@ from typing import (
     Union,
 )
 
-import aiohttp
 import rsa
-from aiohttp import FormData
+from aiohttp import (
+    ClientResponse,
+    FormData,
+)
 from bitstring import BitArray
 from google.protobuf.message import Message
 from urllib3.util import parse_url
@@ -90,7 +92,7 @@ class BaseSteam:
         )
         return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
-    async def _refresh_access_token(
+    async def refresh_access_token(
             self,
             steamid: int,
             access_token: str,
@@ -126,21 +128,14 @@ class BaseSteam:
                 ],
             ),
         )
-        # TODO '{"success":false,"step":"nonce","error":8}'
         return FinalizeLoginStatus.parse_raw(response)
 
-    async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> aiohttp.ClientResponse:
-        return await self._requests.request(
-            method='POST',
-            url=url,
-            data=FormData(
-                fields=[
-                    ('nonce', nonce),
-                    ('auth', auth),
-                    ('steamID', str(steamid)),
-                ],
-            ),
-        )
+    async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> ClientResponse:
+        form = FormData()
+        form.add_field('nonce', nonce)
+        form.add_field('auth', auth)
+        form.add_field('steamID', str(steamid))
+        return await self._requests.request(url, 'POST', data=form)
 
     async def enumerate_tokens(
             self,
@@ -152,7 +147,7 @@ class BaseSteam:
             url='https://api.steampowered.com/IAuthenticationService/EnumerateTokens/v1',
             params={
                 'access_token': access_key,
-            }
+            },
         )
         if return_model:
             return EnumerateTokensModel.parse_raw(response)
