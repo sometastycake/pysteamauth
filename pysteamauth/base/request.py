@@ -16,7 +16,8 @@ from pysteamauth.errors import check_steam_error
 
 class BaseRequestStrategy(RequestStrategyAbstract):
 
-    def __init__(self):
+    def __init__(self, **session_kwargs: Any):
+        self._session_kwargs = session_kwargs
         self._session: Optional[ClientSession] = None
 
     def __del__(self):
@@ -32,7 +33,10 @@ class BaseRequestStrategy(RequestStrategyAbstract):
 
         :return: aiohttp.ClientSession object.
         """
-        return ClientSession(connector=aiohttp.TCPConnector(ssl=False))
+        kwargs = self._session_kwargs
+        if 'connector' not in kwargs:
+            kwargs['connector'] = aiohttp.TCPConnector(ssl=False)
+        return aiohttp.ClientSession(**kwargs)
 
     async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
         if self._session is None:
