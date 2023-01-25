@@ -67,30 +67,6 @@ class BaseSteam:
         )
         return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
-    async def refresh_access_token(
-            self,
-            steamid: int,
-            access_token: str,
-            refresh_token: str,
-    ) -> CAuthentication_AccessToken_GenerateForApp_Response:
-        message = CAuthentication_AccessToken_GenerateForApp_Request(
-            steamid=steamid,
-            refresh_token=refresh_token,
-        )
-        response = await self._requests.bytes(
-            method='POST',
-            url='https://api.steampowered.com/IAuthenticationService/GenerateAccessTokenForApp/v1',
-            params={
-                'access_token': access_token,
-            },
-            data=FormData(
-                fields=[
-                    ('input_protobuf_encoded', pbmessage_to_request(message)),
-                ],
-            ),
-        )
-        return CAuthentication_AccessToken_GenerateForApp_Response.FromString(response)
-
     async def _finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
         response = await self._requests.text(
             method='POST',
@@ -127,3 +103,27 @@ class BaseSteam:
         if return_model:
             return EnumerateTokensModel.parse_raw(response)
         return json.loads(response)
+
+    async def refresh_access_token(
+            self,
+            steamid: int,
+            access_token: str,
+            refresh_token: str,
+    ) -> CAuthentication_AccessToken_GenerateForApp_Response:
+        message = CAuthentication_AccessToken_GenerateForApp_Request(
+            steamid=steamid,
+            refresh_token=refresh_token,
+        )
+        response = await self._requests.bytes(
+            method='POST',
+            url='https://api.steampowered.com/IAuthenticationService/GenerateAccessTokenForApp/v1',
+            params={
+                'access_token': access_token,
+            },
+            data=FormData(
+                fields=[
+                    ('input_protobuf_encoded', pbmessage_to_request(message)),
+                ],
+            ),
+        )
+        return CAuthentication_AccessToken_GenerateForApp_Response.FromString(response)
