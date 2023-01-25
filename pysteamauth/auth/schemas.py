@@ -59,3 +59,9 @@ class EnumerateTokensResponse(BaseModel):
 
 class EnumerateTokensModel(BaseModel):
     response: EnumerateTokensResponse
+
+
+class LoginResult(BaseModel):
+    client_id: int
+    refresh_token: str
+    access_token: str
