@@ -1,10 +1,7 @@
 import base64
-import binascii
 import hashlib
 import hmac
 import json
-import math
-from struct import pack
 from typing import (
     Any,
     Mapping,
@@ -184,28 +181,30 @@ class Steam(BaseSteam):
 
     @classmethod
     async def get_steam_guard(cls, shared_secret: str, server_time: int) -> str:
-        data = binascii.unhexlify(
-            hmac.new(
-                key=base64.b64decode(shared_secret),
-                msg=pack('!L', 0) + pack('!L', math.floor(server_time // 30)),
-                digestmod=hashlib.sha1,
-            ).hexdigest(),
+        sharedsecret = base64.b64decode(shared_secret)
+        secret = BitArray(
+            bytes=sharedsecret,
+            length=len(sharedsecret) * 8,
         )
-
-        value = data[19] & 0xF
-        full_code = (
-            (data[value] & 0x7F) << 24 |       # noqa:W504
-            (data[value + 1] & 0xFF) << 16 |   # noqa:W504
-            (data[value + 2] & 0xFF) << 8 |    # noqa:W504
-            (data[value + 3] & 0xFF)
+        buffer = BitArray(8 * 8)
+        buffer[4 * 8:] = int(server_time // 30)
+        signature = hmac.new(
+            key=secret.tobytes(),
+            msg=buffer.tobytes(),
+            digestmod=hashlib.sha1,
+        ).digest()
+        hashed = BitArray(
+            bytes=signature,
+            length=len(signature) * 8,
         )
-
+        start = hashed[(19 * 8):(19 * 8) + 8] & BitArray('0x0f')
+        slice_ = hashed[start.int * 8:(start.int * 8) + (4 * 8)]
+        fullcode = (slice_ & BitArray("0x7fffffff")).int
+        symbols = '23456789BCDFGHJKMNPQRTVWXY'
         code = ''
-        chars = '23456789BCDFGHJKMNPQRTVWXY'
         for _ in range(5):
-            code += chars[full_code % len(chars)]
-            full_code //= len(chars)
-
+            code += symbols[int(fullcode % len(symbols))]
+            fullcode = fullcode / len(symbols)
         return code
 
     def get_confirmation_hash(self, server_time: int, tag: str = 'conf') -> str:
