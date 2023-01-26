@@ -16,8 +16,8 @@ from pysteamauth.abstract import (
     RequestStrategyAbstract,
 )
 from pysteamauth.auth.schemas import LoginResult
-from pysteamauth.auth.steam import pbmessage_to_request
 from pysteamauth.auth.steambase import BaseSteam
+from pysteamauth.auth.utils import pbmessage_to_request
 from pysteamauth.pb.enums_pb2 import ESessionPersistence
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_BeginAuthSessionViaQR_Request,

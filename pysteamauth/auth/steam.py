@@ -14,7 +14,6 @@ from typing import (
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
-from google.protobuf.message import Message
 from urllib3.util import parse_url
 
 from pysteamauth.abstract import (
@@ -40,10 +39,6 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
 )
 
 from .schemas import FinalizeLoginStatus
-
-
-def pbmessage_to_request(msg: Message) -> str:
-    return str(base64.b64encode(msg.SerializeToString()), 'utf8')
 
 
 class Steam:

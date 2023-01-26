@@ -18,7 +18,7 @@ from pysteamauth.auth.schemas import (
     EnumerateTokensModel,
     FinalizeLoginStatus,
 )
-from pysteamauth.auth.steam import pbmessage_to_request
+from pysteamauth.auth.utils import pbmessage_to_request
 from pysteamauth.base import (
     BaseCookieStorage,
     BaseRequestStrategy,
