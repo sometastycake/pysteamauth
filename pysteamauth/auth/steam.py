@@ -1,9 +1,7 @@
 import base64
-import binascii
 import hashlib
 import hmac
 import json
-import math
 from struct import pack
 from typing import (
     Any,
@@ -11,6 +9,8 @@ from typing import (
     Optional,
 )
 
+import binascii
+import math
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
@@ -20,10 +20,6 @@ from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
-from pysteamauth.base import (
-    BaseCookieStorage,
-    BaseRequestStrategy,
-)
 from pysteamauth.pb.enums_pb2 import ESessionPersistence
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_AllowedConfirmation,
@@ -31,17 +27,14 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_BeginAuthSessionViaCredentials_Response,
     CAuthentication_GetPasswordRSAPublicKey_Request,
     CAuthentication_GetPasswordRSAPublicKey_Response,
-    CAuthentication_PollAuthSessionStatus_Request,
-    CAuthentication_PollAuthSessionStatus_Response,
     CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
     EAuthSessionGuardType,
     EAuthTokenPlatformType,
 )
+from .steambase import BaseSteam
 
-from .schemas import FinalizeLoginStatus
 
-
-class Steam:
+class Steam(BaseSteam):
 
     def __init__(
         self,
@@ -54,14 +47,13 @@ class Steam:
         cookie_storage: Optional[CookieStorageAbstract] = None,
         request_strategy: Optional[RequestStrategyAbstract] = None,
     ):
+        super().__init__(request_strategy, cookie_storage)
         self._login = login
         self._steamid = steamid
         self._password = password
         self._shared_secret = shared_secret
         self._identity_secret = identity_secret
         self._device_id = device_id
-        self._requests = request_strategy if request_strategy is not None else BaseRequestStrategy()
-        self._storage = cookie_storage if cookie_storage is not None else BaseCookieStorage()
 
     @property
     def steamid(self) -> int:
@@ -260,53 +252,6 @@ class Steam:
             data=FormData(
                 fields=[
                     ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
-                ],
-            ),
-        )
-
-    async def _poll_auth_session_status(
-            self,
-            client_id: int,
-            request_id: bytes,
-    ) -> CAuthentication_PollAuthSessionStatus_Response:
-        message = CAuthentication_PollAuthSessionStatus_Request(
-            client_id=client_id,
-            request_id=request_id,
-        )
-        response = await self._requests.bytes(
-            method='POST',
-            url='https://api.steampowered.com/IAuthenticationService/PollAuthSessionStatus/v1',
-            data=FormData(
-                fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
-                ],
-            ),
-        )
-        return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
-
-    async def _finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
-        response = await self._requests.text(
-            method='POST',
-            url='https://login.steampowered.com/jwt/finalizelogin',
-            data=FormData(
-                fields=[
-                    ('nonce', refresh_token),
-                    ('sessionid', sessionid),
-                    ('redir', 'https://steamcommunity.com/login/home/?goto='),
-                ],
-            ),
-        )
-        return FinalizeLoginStatus.parse_raw(response)
-
-    async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> None:
-        await self._requests.request(
-            method='POST',
-            url=url,
-            data=FormData(
-                fields=[
-                    ('nonce', nonce),
-                    ('auth', auth),
-                    ('steamID', str(steamid)),
                 ],
             ),
         )
