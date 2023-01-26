@@ -104,7 +104,7 @@ class Steam(BaseSteam):
 
     async def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
         return await self._storage.get(
-            login=self._login,
+            key=self._login,
             domain=domain,
         )
 
@@ -113,7 +113,7 @@ class Steam(BaseSteam):
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         cookies = await self._storage.get(
-            login=self._login,
+            key=self._login,
             domain=parse_url(url).host,
         )
         return await self._requests.text(
@@ -317,4 +317,4 @@ class Steam(BaseSteam):
             cookies.update({
                 parse_url(url).host: self._requests.cookies(parse_url(url).host),
             })
-        await self._storage.set(login=self._login, cookies=cookies)
+        await self._storage.set(key=self._login, cookies=cookies)

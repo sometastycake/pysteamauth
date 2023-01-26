@@ -50,7 +50,7 @@ class SteamQR(BaseSteam):
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         cookies = await self._storage.get(
-            login=str(self._steamid),
+            key=str(self._steamid),
             domain=parse_url(url).host,
         )
         return await self._requests.text(
@@ -106,16 +106,16 @@ class SteamQR(BaseSteam):
         return CAuthentication_GetAuthSessionInfo_Response.FromString(response)
 
     async def _update_auth_session(self, client_id: int, version: int) -> None:
-        message = version.to_bytes(2, 'little')
-        message += client_id.to_bytes(8, 'little')
-        message += self.steamid.to_bytes(8, 'little')
-
+        message = (
+            version.to_bytes(2, 'little') +
+            client_id.to_bytes(8, 'little') +
+            self.steamid.to_bytes(8, 'little')
+        )
         signature = hmac.new(
             key=base64.b64decode(self._shared_secret),
             msg=message,
             digestmod=hashlib.sha256,
         )
-
         message = CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request(
             client_id=client_id,
             version=version,
