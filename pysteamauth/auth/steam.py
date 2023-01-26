@@ -1,7 +1,9 @@
 import base64
+import binascii
 import hashlib
 import hmac
 import json
+import math
 from struct import pack
 from typing import (
     Any,
@@ -9,8 +11,6 @@ from typing import (
     Optional,
 )
 
-import binascii
-import math
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
@@ -31,8 +31,25 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     EAuthSessionGuardType,
     EAuthTokenPlatformType,
 )
+
+from ..base import BaseRequestStrategy
 from .steambase import BaseSteam
 from .utils import pbmessage_to_request
+
+
+class SteamServerTime:
+
+    _requests = BaseRequestStrategy(
+        raise_for_status=True,
+    )
+
+    @classmethod
+    async def get_time(cls) -> int:
+        response = await cls._requests.text(
+            method='POST',
+            url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
+        )
+        return int(json.loads(response)['response']['server_time'])
 
 
 class Steam(BaseSteam):
@@ -165,14 +182,6 @@ class Steam(BaseSteam):
         )
         return CAuthentication_BeginAuthSessionViaCredentials_Response.FromString(response)
 
-    async def get_server_time(self) -> int:
-        response = await self._requests.text(
-            method='POST',
-            url='https://api.steampowered.com/ITwoFactorService/QueryTime/v0001',
-        )
-        data = json.loads(response)
-        return int(data['response']['server_time'])
-
     @classmethod
     async def get_steam_guard(cls, shared_secret: str, server_time: int) -> str:
         data = binascii.unhexlify(
@@ -276,7 +285,7 @@ class Steam(BaseSteam):
         )
         if auth_session.allowed_confirmations:
             if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
-                server_time = await self.get_server_time()
+                server_time = await SteamServerTime.get_time()
                 code = await Steam.get_steam_guard(self.shared_secret, server_time)
                 await self._update_auth_session(
                     client_id=auth_session.client_id,
