@@ -32,6 +32,7 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     EAuthTokenPlatformType,
 )
 from .steambase import BaseSteam
+from .utils import pbmessage_to_request
 
 
 class Steam(BaseSteam):
@@ -133,7 +134,7 @@ class Steam(BaseSteam):
             method='GET',
             url='https://api.steampowered.com/IAuthenticationService/GetPasswordRSAPublicKey/v1',
             params={
-                'input_protobuf_encoded': str(base64.b64encode(message.SerializeToString()), 'utf8'),
+                'input_protobuf_encoded': pbmessage_to_request(message),
             },
         )
         return CAuthentication_GetPasswordRSAPublicKey_Response.FromString(response)
@@ -158,7 +159,7 @@ class Steam(BaseSteam):
             url='https://api.steampowered.com/IAuthenticationService/BeginAuthSessionViaCredentials/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
+                    ('input_protobuf_encoded', pbmessage_to_request(message)),
                 ],
             ),
         )
@@ -251,7 +252,7 @@ class Steam(BaseSteam):
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithSteamGuardCode/v1',
             data=FormData(
                 fields=[
-                    ('input_protobuf_encoded', str(base64.b64encode(message.SerializeToString()), 'utf8')),
+                    ('input_protobuf_encoded', pbmessage_to_request(message)),
                 ],
             ),
         )
