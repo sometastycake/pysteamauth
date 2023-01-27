@@ -91,7 +91,7 @@ class SteamQR(BaseSteam):
             digestmod=hashlib.sha256,
         )
 
-    async def _update_auth_session(
+    async def _update_auth_session_with_mobile_confirmation(
             self,
             client_id: int,
             version: int,
@@ -130,7 +130,7 @@ class SteamQR(BaseSteam):
             method='GET',
         )
         authsession = await self._begin_auth_session()
-        await self._update_auth_session(
+        await self._update_auth_session_with_mobile_confirmation(
             client_id=authsession.client_id,
             version=authsession.version,
         )
