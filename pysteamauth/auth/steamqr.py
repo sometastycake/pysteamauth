@@ -2,7 +2,6 @@ import asyncio
 import base64
 import hashlib
 import hmac
-import json
 from typing import (
     Any,
     Optional,
@@ -62,12 +61,6 @@ class SteamQR(BaseSteam):
             },
             **kwargs,
         )
-
-    async def is_authorized(self) -> bool:
-        response: str = await self.request(
-            url='https://steamcommunity.com/chat/clientjstoken',
-        )
-        return json.loads(response)['logged_in']
 
     async def _begin_auth_session(self) -> CAuthentication_BeginAuthSessionViaQR_Response:
         message = CAuthentication_BeginAuthSessionViaQR_Request(

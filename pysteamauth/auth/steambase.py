@@ -1,5 +1,6 @@
 import json
 from typing import (
+    Any,
     Dict,
     Optional,
     Union,
@@ -46,6 +47,15 @@ class BaseSteam:
             cookie_storage
                 if cookie_storage is not None else BaseCookieStorage()
         )
+
+    async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
+        raise NotImplementedError
+
+    async def is_authorized(self) -> bool:
+        response: str = await self.request(
+            url='https://steamcommunity.com/chat/clientjstoken',
+        )
+        return json.loads(response)['logged_in']
 
     async def _poll_auth_session_status(
             self,
