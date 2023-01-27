@@ -21,8 +21,6 @@ from pysteamauth.pb.enums_pb2 import ESessionPersistence
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_BeginAuthSessionViaQR_Request,
     CAuthentication_BeginAuthSessionViaQR_Response,
-    CAuthentication_GetAuthSessionInfo_Request,
-    CAuthentication_GetAuthSessionInfo_Response,
     CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request,
     EAuthTokenPlatformType,
 )
@@ -79,24 +77,6 @@ class SteamQR(BaseSteam):
             ),
         )
         return CAuthentication_BeginAuthSessionViaQR_Response.FromString(response)
-
-    async def get_session_info(self, client_id: int) -> CAuthentication_GetAuthSessionInfo_Response:
-        message = CAuthentication_GetAuthSessionInfo_Request(
-            client_id=client_id,
-        )
-        response = await self._requests.bytes(
-            method='POST',
-            url='https://api.steampowered.com/IAuthenticationService/GetAuthSessionInfo/v1',
-            params={
-                'access_token': self._mobile_access_token,
-            },
-            data=FormData(
-                fields=[
-                    ('input_protobuf_encoded', pbmessage_to_request(message)),
-                ],
-            ),
-        )
-        return CAuthentication_GetAuthSessionInfo_Response.FromString(response)
 
     async def _update_auth_session(self, client_id: int, version: int) -> None:
         message = (
