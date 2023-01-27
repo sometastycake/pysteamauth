@@ -101,6 +101,7 @@ class SteamQR(BaseSteam):
             self,
             client_id: int,
             version: int,
+            persistence: ESessionPersistence,
     ) -> CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response:
         signature = self._create_auth_session_signature(
             client_id=client_id,
@@ -112,7 +113,7 @@ class SteamQR(BaseSteam):
             steamid=self._steamid,
             confirm=True,
             signature=signature.digest(),
-            persistence=ESessionPersistence.k_ESessionPersistence_Persistent,
+            persistence=persistence,
         )
         response = await self._requests.bytes(
             method='POST',
@@ -128,26 +129,25 @@ class SteamQR(BaseSteam):
         )
         return CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response.FromString(response)
 
-    async def login_to_steam(self) -> Optional[LoginResult]:
+    async def login_to_steam(
+            self,
+            persistence: ESessionPersistence = ESessionPersistence.k_ESessionPersistence_Persistent
+    ) -> Optional[LoginResult]:
         if await self.is_authorized():
             return None
-        await self._requests.request(
-            url='https://steamcommunity.com/',
-            method='GET',
-        )
-        authsession = await self._begin_auth_session()
+        await self._requests.request(url='https://steamcommunity.com/', method='GET')
+        session = await self._begin_auth_session()
         await self._update_auth_session_with_mobile_confirmation(
-            client_id=authsession.client_id,
-            version=authsession.version,
+            client_id=session.client_id,
+            version=session.version,
+            persistence=persistence,
         )
         session_status = await self._poll_auth_session_status(
-            client_id=authsession.client_id,
-            request_id=authsession.request_id,
+            client_id=session.client_id, request_id=session.request_id,
         )
         sessionid = self._requests.cookies()['sessionid']
         tokens = await self._finalize_login(
-            refresh_token=session_status.refresh_token,
-            sessionid=sessionid,
+            refresh_token=session_status.refresh_token, sessionid=sessionid,
         )
         await asyncio.gather(*[
             self._set_token(
@@ -162,7 +162,7 @@ class SteamQR(BaseSteam):
             })
         await self._storage.set(str(self.steamid), cookies)
         return LoginResult(
-            client_id=authsession.client_id,
+            client_id=session.client_id,
             refresh_token=session_status.refresh_token,
             access_token=session_status.access_token,
         )

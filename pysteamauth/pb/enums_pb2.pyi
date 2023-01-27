@@ -421,7 +421,10 @@ class ETouchGesture(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 
 
 class ESessionPersistence(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = [
+        'k_ESessionPersistence_Ephemeral',
+        'k_ESessionPersistence_Persistent',
+    ]
 
 
 class ENewSteamAnnouncementState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
