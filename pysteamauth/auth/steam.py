@@ -158,15 +158,17 @@ class Steam(BaseSteam):
             self,
             encrypted_password: str,
             rsa_timestamp: int,
+            platform: EAuthTokenPlatformType,
+            persistence: ESessionPersistence,
     ) -> CAuthentication_BeginAuthSessionViaCredentials_Response:
         message = CAuthentication_BeginAuthSessionViaCredentials_Request(
             account_name=self._login,
             encrypted_password=encrypted_password,
             encryption_timestamp=rsa_timestamp,
             remember_login=True,
-            platform_type=EAuthTokenPlatformType.k_EAuthTokenPlatformType_WebBrowser,
+            platform_type=platform,
             website_id='Community',
-            persistence=ESessionPersistence.k_ESessionPersistence_Persistent,
+            persistence=persistence,
             device_friendly_name='Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8',
         )
         response = await self._requests.bytes(
@@ -269,7 +271,11 @@ class Steam(BaseSteam):
     def _is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
         return confirmation.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode
 
-    async def login_to_steam(self) -> Optional[LoginResult]:
+    async def login_to_steam(
+            self,
+            platform: EAuthTokenPlatformType = EAuthTokenPlatformType.k_EAuthTokenPlatformType_WebBrowser,
+            persistence: ESessionPersistence = ESessionPersistence.k_ESessionPersistence_Persistent
+    ) -> Optional[LoginResult]:
         if await self.is_authorized():
             return None
         if not self._requests.cookies().get('sessionid'):
@@ -282,6 +288,8 @@ class Steam(BaseSteam):
         auth_session = await self._begin_auth_session(
             encrypted_password=encrypted_password,
             rsa_timestamp=keys.timestamp,
+            platform=platform,
+            persistence=persistence,
         )
         if auth_session.allowed_confirmations:
             if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
