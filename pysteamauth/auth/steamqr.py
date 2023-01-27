@@ -22,6 +22,7 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_BeginAuthSessionViaQR_Request,
     CAuthentication_BeginAuthSessionViaQR_Response,
     CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request,
+    CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response,
     EAuthTokenPlatformType,
 )
 
@@ -90,7 +91,11 @@ class SteamQR(BaseSteam):
             digestmod=hashlib.sha256,
         )
 
-    async def _update_auth_session(self, client_id: int, version: int) -> None:
+    async def _update_auth_session(
+            self,
+            client_id: int,
+            version: int,
+    ) -> CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response:
         signature = self._create_auth_session_signature(
             client_id=client_id,
             version=version
@@ -103,7 +108,7 @@ class SteamQR(BaseSteam):
             signature=signature.digest(),
             persistence=ESessionPersistence.k_ESessionPersistence_Persistent,
         )
-        await self._requests.text(
+        response = await self._requests.bytes(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithMobileConfirmation/v1',
             params={
@@ -115,6 +120,7 @@ class SteamQR(BaseSteam):
                 ],
             ),
         )
+        return CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response.FromString(response)
 
     async def login_to_steam(self) -> Optional[LoginResult]:
         if await self.is_authorized():
