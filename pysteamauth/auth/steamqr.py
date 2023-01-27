@@ -4,6 +4,7 @@ import hashlib
 import hmac
 from typing import (
     Any,
+    Dict,
     Optional,
 )
 
@@ -46,9 +47,14 @@ class SteamQR(BaseSteam):
     def steamid(self) -> int:
         return self._steamid
 
+    async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
+        return await self._storage.get(
+            key=self._steamid,
+            domain=domain,
+        )
+
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
-        cookies = await self._storage.get(
-            key=str(self._steamid),
+        cookies = await self.cookies(
             domain=parse_url(url).host,
         )
         return await self._requests.text(
@@ -83,7 +89,7 @@ class SteamQR(BaseSteam):
         message = (
             version.to_bytes(2, 'little') +
             client_id.to_bytes(8, 'little') +
-            self.steamid.to_bytes(8, 'little')
+            self._steamid.to_bytes(8, 'little')
         )
         return hmac.new(
             key=base64.b64decode(self._shared_secret),
