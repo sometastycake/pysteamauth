@@ -30,6 +30,7 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
 )
 
 from ..base import BaseRequestStrategy
+from .schemas import LoginResult
 from .steambase import BaseSteam
 from .utils import pbmessage_to_request
 
@@ -268,9 +269,9 @@ class Steam(BaseSteam):
     def _is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
         return confirmation.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode
 
-    async def login_to_steam(self) -> None:
+    async def login_to_steam(self) -> Optional[LoginResult]:
         if await self.is_authorized():
-            return
+            return None
         if not self._requests.cookies().get('sessionid'):
             await self._requests.bytes(
                 method='GET',
@@ -318,3 +319,8 @@ class Steam(BaseSteam):
                 parse_url(url).host: self._requests.cookies(parse_url(url).host),
             })
         await self._storage.set(key=self._login, cookies=cookies)
+        return LoginResult(
+            client_id=auth_session.client_id,
+            refresh_token=session.refresh_token,
+            access_token=session.access_token,
+        )
