@@ -78,16 +78,22 @@ class SteamQR(BaseSteam):
         )
         return CAuthentication_BeginAuthSessionViaQR_Response.FromString(response)
 
-    async def _update_auth_session(self, client_id: int, version: int) -> None:
+    def _create_auth_session_signature(self, client_id: int, version: int) -> hmac.HMAC:
         message = (
             version.to_bytes(2, 'little') +
             client_id.to_bytes(8, 'little') +
             self.steamid.to_bytes(8, 'little')
         )
-        signature = hmac.new(
+        return hmac.new(
             key=base64.b64decode(self._shared_secret),
             msg=message,
             digestmod=hashlib.sha256,
+        )
+
+    async def _update_auth_session(self, client_id: int, version: int) -> None:
+        signature = self._create_auth_session_signature(
+            client_id=client_id,
+            version=version
         )
         message = CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request(
             client_id=client_id,
