@@ -120,12 +120,7 @@ class SteamQR(BaseSteam):
     async def _set_additional_cookies(self, urls: List[str]) -> None:
         tasks = []
         for url in urls:
-            tasks.append(
-                self._requests.request(
-                    url=URL(url).origin(),
-                    method='GET',
-                )
-            )
+            tasks.append(self._requests.request(URL(url).origin(), 'GET'))
         await asyncio.gather(*tasks)
 
     async def login_to_steam(
@@ -134,39 +129,29 @@ class SteamQR(BaseSteam):
     ) -> Optional[LoginResult]:
         if await self.is_alive_session():
             return None
-        await self._requests.request(
-            url='https://steamcommunity.com/',
-            method='GET',
-        )
+        await self._requests.request('https://steamcommunity.com/', 'GET')
         session = await self._begin_auth_session_via_qr()
         await self._update_auth_session_with_mobile_confirmation(
             client_id=session.client_id,
             version=session.version,
             persistence=persistence,
         )
-        session_status = await self._poll_auth_session_status(
-            client_id=session.client_id,
-            request_id=session.request_id,
-        )
+        session_status = await self._poll_auth_session_status(session.client_id, session.request_id)
         sessionid = self._requests.cookies()['sessionid']
-        tokens = await self._finalize_login(
-            refresh_token=session_status.refresh_token,
-            sessionid=sessionid,
-        )
+        tokens = await self._finalize_login(session_status.refresh_token, sessionid)
         urls = [token.url for token in tokens.transfer_info]
-        await self._set_tokens(self._steamid, tokens.transfer_info)
+        await self._set_tokens(
+            steamid=self._steamid,
+            transfer_info=tokens.transfer_info,
+        )
         await self._set_additional_cookies(urls)
         cookies = {}
         for url in urls:
             host = parse_url(url).host
             cookies.update({
-                host: self._requests.cookies(host),
+                host: self._requests.cookies(host)
             })
-        await self._storage.set(
-            key=str(self.steamid),
-            platform=k_EAuthTokenPlatformType_WebBrowser,
-            cookies=cookies,
-        )
+        await self._storage.set(str(self.steamid), k_EAuthTokenPlatformType_WebBrowser, cookies)
         return LoginResult(
             client_id=session.client_id,
             refresh_token=session_status.refresh_token,
