@@ -14,7 +14,7 @@ requirements = [
 
 setup(
     name='pysteamauth',
-    version='1.0.0',
+    version='2.0.0a1',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',
