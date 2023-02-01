@@ -1,6 +1,6 @@
 from typing import (
     Any,
-    Mapping,
+    Dict,
     Optional,
 )
 
@@ -47,7 +47,7 @@ class BaseRequestStrategy(RequestStrategyAbstract):
             check_steam_error(int(error))
         return response
 
-    def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
+    def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         if self._session is None:
             raise RuntimeError('Session is not initialized')
         cookies = {}

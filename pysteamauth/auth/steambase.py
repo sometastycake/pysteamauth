@@ -1,15 +1,19 @@
+import asyncio
 import json
 from typing import (
     Any,
     Dict,
+    List,
     Optional,
     Union,
 )
 
+import aiohttp
 from aiohttp import (
     ClientResponse,
     FormData,
 )
+from urllib3.util import parse_url
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
@@ -18,6 +22,7 @@ from pysteamauth.abstract import (
 from pysteamauth.auth.schemas import (
     EnumerateTokensModel,
     FinalizeLoginStatus,
+    TransferInfoItem,
 )
 from pysteamauth.auth.utils import pbmessage_to_request
 from pysteamauth.base import (
@@ -39,19 +44,44 @@ class BaseSteam:
             request_strategy: Optional[RequestStrategyAbstract] = None,
             cookie_storage: Optional[CookieStorageAbstract] = None,
     ):
-        if request_strategy is not None:
+        if isinstance(request_strategy, RequestStrategyAbstract):
             self._requests = request_strategy
+        elif request_strategy is None:
+            self._requests = BaseRequestStrategy(
+                raise_for_status=True,
+                timeout=aiohttp.ClientTimeout(total=30),
+            )
         else:
-            self._requests = BaseRequestStrategy(raise_for_status=True)
-        self._storage = (
-            cookie_storage
-                if cookie_storage is not None else BaseCookieStorage()
-        )
+            raise TypeError('Requests strategy is not realizing RequestStrategyAbstract')
 
-    async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
+        if isinstance(cookie_storage, CookieStorageAbstract):
+            self._storage = cookie_storage
+        elif cookie_storage is None:
+            self._storage = BaseCookieStorage()
+        else:
+            raise TypeError('Cookie storage is not realizing CookieStorageAbstract')
+
+    async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         raise NotImplementedError
 
-    async def is_authorized(self) -> bool:
+    async def sessionid(self, domain: str = 'steamcommunity.com') -> str:
+        return (await self.cookies(domain))['sessionid']
+
+    async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
+        cookies = await self.cookies(
+            domain=parse_url(url).host,
+        )
+        return await self._requests.text(
+            url=url,
+            method=method,
+            cookies={
+                **cookies,
+                **kwargs.pop('cookies', {}),
+            },
+            **kwargs,
+        )
+
+    async def is_alive_session(self) -> bool:
         response: str = await self.request(
             url='https://steamcommunity.com/chat/clientjstoken',
         )
@@ -90,6 +120,19 @@ class BaseSteam:
             ),
         )
         return FinalizeLoginStatus.parse_raw(response)
+
+    async def _set_tokens(self, steamid: int, transfer_info: List[TransferInfoItem]) -> None:
+        tasks = []
+        for token in transfer_info:
+            tasks.append(
+                self._set_token(
+                    url=token.url,
+                    nonce=token.params.nonce,
+                    auth=token.params.auth,
+                    steamid=steamid,
+                )
+            )
+        await asyncio.gather(*tasks)
 
     async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> ClientResponse:
         form = FormData()

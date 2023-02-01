@@ -3,13 +3,14 @@ import base64
 import hashlib
 import hmac
 from typing import (
-    Any,
     Dict,
+    List,
     Optional,
 )
 
 from aiohttp import FormData
 from urllib3.util import parse_url
+from yarl import URL
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
@@ -18,13 +19,16 @@ from pysteamauth.abstract import (
 from pysteamauth.auth.schemas import LoginResult
 from pysteamauth.auth.steambase import BaseSteam
 from pysteamauth.auth.utils import pbmessage_to_request
-from pysteamauth.pb.enums_pb2 import ESessionPersistence
+from pysteamauth.pb.enums_pb2 import (
+    ESessionPersistence,
+    k_ESessionPersistence_Persistent,
+)
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_BeginAuthSessionViaQR_Request,
     CAuthentication_BeginAuthSessionViaQR_Response,
     CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request,
     CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response,
-    EAuthTokenPlatformType,
+    k_EAuthTokenPlatformType_WebBrowser,
 )
 
 
@@ -51,28 +55,12 @@ class SteamQR(BaseSteam):
         return await self._storage.get(
             key=self._steamid,
             domain=domain,
+            platform=k_EAuthTokenPlatformType_WebBrowser,
         )
 
-    async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
-        cookies = await self.cookies(
-            domain=parse_url(url).host,
-        )
-        return await self._requests.text(
-            url=url,
-            method=method,
-            cookies={
-                **cookies,
-                **kwargs.pop('cookies', {}),
-            },
-            **kwargs,
-        )
-
-    async def _begin_auth_session(self) -> CAuthentication_BeginAuthSessionViaQR_Response:
+    async def _begin_auth_session_via_qr(self) -> CAuthentication_BeginAuthSessionViaQR_Response:
         message = CAuthentication_BeginAuthSessionViaQR_Request(
-            device_friendly_name=(
-                'Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8'
-            ),
-            platform_type=EAuthTokenPlatformType.k_EAuthTokenPlatformType_WebBrowser
+            platform_type=k_EAuthTokenPlatformType_WebBrowser
         )
         response = await self._requests.bytes(
             method='POST',
@@ -129,38 +117,56 @@ class SteamQR(BaseSteam):
         )
         return CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response.FromString(response)
 
+    async def _set_additional_cookies(self, urls: List[str]) -> None:
+        tasks = []
+        for url in urls:
+            tasks.append(
+                self._requests.request(
+                    url=URL(url).origin(),
+                    method='GET',
+                )
+            )
+        await asyncio.gather(*tasks)
+
     async def login_to_steam(
             self,
-            persistence: ESessionPersistence = ESessionPersistence.k_ESessionPersistence_Persistent
+            persistence: ESessionPersistence = k_ESessionPersistence_Persistent,
     ) -> Optional[LoginResult]:
-        if await self.is_authorized():
+        if await self.is_alive_session():
             return None
-        await self._requests.request(url='https://steamcommunity.com/', method='GET')
-        session = await self._begin_auth_session()
+        await self._requests.request(
+            url='https://steamcommunity.com/',
+            method='GET',
+        )
+        session = await self._begin_auth_session_via_qr()
         await self._update_auth_session_with_mobile_confirmation(
             client_id=session.client_id,
             version=session.version,
             persistence=persistence,
         )
         session_status = await self._poll_auth_session_status(
-            client_id=session.client_id, request_id=session.request_id,
+            client_id=session.client_id,
+            request_id=session.request_id,
         )
         sessionid = self._requests.cookies()['sessionid']
         tokens = await self._finalize_login(
-            refresh_token=session_status.refresh_token, sessionid=sessionid,
+            refresh_token=session_status.refresh_token,
+            sessionid=sessionid,
         )
-        await asyncio.gather(*[
-            self._set_token(
-                token.url, token.params.nonce, token.params.auth, self._steamid,
-            ) for token in tokens.transfer_info
-        ])
+        urls = [token.url for token in tokens.transfer_info]
+        await self._set_tokens(self._steamid, tokens.transfer_info)
+        await self._set_additional_cookies(urls)
         cookies = {}
-        for token in tokens.transfer_info:
-            host = parse_url(token.url).host
+        for url in urls:
+            host = parse_url(url).host
             cookies.update({
                 host: self._requests.cookies(host),
             })
-        await self._storage.set(str(self.steamid), cookies)
+        await self._storage.set(
+            key=str(self.steamid),
+            platform=k_EAuthTokenPlatformType_WebBrowser,
+            cookies=cookies,
+        )
         return LoginResult(
             client_id=session.client_id,
             refresh_token=session_status.refresh_token,

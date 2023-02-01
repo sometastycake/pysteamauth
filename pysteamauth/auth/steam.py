@@ -1,10 +1,13 @@
+import asyncio
 import base64
+import binascii
 import hashlib
 import hmac
 import json
+from struct import pack
 from typing import (
-    Any,
-    Mapping,
+    Dict,
+    List,
     Optional,
 )
 
@@ -12,12 +15,17 @@ import rsa
 from aiohttp import FormData
 from bitstring import BitArray
 from urllib3.util import parse_url
+from yarl import URL
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
-from pysteamauth.pb.enums_pb2 import ESessionPersistence
+from pysteamauth.base import BaseRequestStrategy
+from pysteamauth.pb.enums_pb2 import (
+    ESessionPersistence,
+    k_ESessionPersistence_Persistent,
+)
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_AllowedConfirmation,
     CAuthentication_BeginAuthSessionViaCredentials_Request,
@@ -25,14 +33,19 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     CAuthentication_GetPasswordRSAPublicKey_Request,
     CAuthentication_GetPasswordRSAPublicKey_Response,
     CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request,
+    CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response,
     EAuthSessionGuardType,
     EAuthTokenPlatformType,
+    k_EAuthSessionGuardType_DeviceCode,
+    k_EAuthTokenPlatformType_WebBrowser,
 )
 
-from ..base import BaseRequestStrategy
 from .schemas import LoginResult
 from .steambase import BaseSteam
-from .utils import pbmessage_to_request
+from .utils import (
+    get_website_id_by_platform,
+    pbmessage_to_request,
+)
 
 
 class SteamServerTime:
@@ -62,6 +75,7 @@ class Steam(BaseSteam):
         device_id: Optional[str] = None,
         cookie_storage: Optional[CookieStorageAbstract] = None,
         request_strategy: Optional[RequestStrategyAbstract] = None,
+        platform: EAuthTokenPlatformType = k_EAuthTokenPlatformType_WebBrowser,
     ):
         super().__init__(request_strategy, cookie_storage)
         self._login = login
@@ -70,29 +84,22 @@ class Steam(BaseSteam):
         self._shared_secret = shared_secret
         self._identity_secret = identity_secret
         self._device_id = device_id
+        self._platform = platform
 
     @property
-    def steamid(self) -> int:
-        if not self._steamid:
-            raise ValueError('steamid is not specified')
+    def steamid(self) -> Optional[int]:
         return self._steamid
 
     @property
-    def shared_secret(self) -> str:
-        if not self._shared_secret:
-            raise ValueError('shared_secret is not specified')
+    def shared_secret(self) -> Optional[str]:
         return self._shared_secret
 
     @property
-    def identity_secret(self) -> str:
-        if not self._identity_secret:
-            raise ValueError('identity_secret is not specified')
+    def identity_secret(self) -> Optional[str]:
         return self._identity_secret
 
     @property
-    def device_id(self) -> str:
-        if not self._device_id:
-            raise ValueError('device_id is not specified')
+    def device_id(self) -> Optional[str]:
         return self._device_id
 
     @property
@@ -101,45 +108,16 @@ class Steam(BaseSteam):
 
     @property
     def partner_id(self) -> int:
-        return self.steamid - 76561197960265728
+        if self._steamid is None:
+            raise ValueError('steamid is not specified')
+        return self._steamid - 76561197960265728
 
-    async def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:
+    async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         return await self._storage.get(
-            key=self._login,
+            key=self._steamid,
+            platform=self._platform,
             domain=domain,
         )
-
-    async def sessionid(self, domain: str = 'steamcommunity.com') -> str:
-        return (await self.cookies(domain))['sessionid']
-
-    async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
-        cookies = await self._storage.get(
-            key=self._login,
-            domain=parse_url(url).host,
-        )
-        return await self._requests.text(
-            url=url,
-            method=method,
-            cookies={
-                **cookies,
-                **kwargs.pop('cookies', {}),
-            },
-            **kwargs,
-        )
-
-    async def is_authorized(self) -> bool:
-        response: str = await self.request(
-            url='https://steamcommunity.com/chat/clientjstoken',
-        )
-        data = json.loads(response)
-        logged_in = data['logged_in']
-        if logged_in:
-            if not self._steamid:
-                try:
-                    self._steamid = int(data['steamid'])
-                except KeyError:
-                    ...
-        return logged_in
 
     async def _getrsakey(self) -> CAuthentication_GetPasswordRSAPublicKey_Response:
         message = CAuthentication_GetPasswordRSAPublicKey_Request(
@@ -154,11 +132,10 @@ class Steam(BaseSteam):
         )
         return CAuthentication_GetPasswordRSAPublicKey_Response.FromString(response)
 
-    async def _begin_auth_session(
+    async def _begin_auth_session_via_credentials(
             self,
             encrypted_password: str,
             rsa_timestamp: int,
-            platform: EAuthTokenPlatformType,
             persistence: ESessionPersistence,
     ) -> CAuthentication_BeginAuthSessionViaCredentials_Response:
         message = CAuthentication_BeginAuthSessionViaCredentials_Request(
@@ -166,10 +143,9 @@ class Steam(BaseSteam):
             encrypted_password=encrypted_password,
             encryption_timestamp=rsa_timestamp,
             remember_login=True,
-            platform_type=platform,
-            website_id='Community',
+            platform_type=self._platform,
+            website_id=get_website_id_by_platform(self._platform),
             persistence=persistence,
-            device_friendly_name='Mozilla/5.0 (X11; Linux x86_64; rv:1.9.5.20) Gecko/2812-12-10 04:56:28 Firefox/3.8',
         )
         response = await self._requests.bytes(
             method='POST',
@@ -184,30 +160,28 @@ class Steam(BaseSteam):
 
     @classmethod
     async def get_steam_guard(cls, shared_secret: str, server_time: int) -> str:
-        sharedsecret = base64.b64decode(shared_secret)
-        secret = BitArray(
-            bytes=sharedsecret,
-            length=len(sharedsecret) * 8,
+        data = binascii.unhexlify(
+            hmac.new(
+                key=base64.b64decode(shared_secret),
+                msg=pack('!L', 0) + pack('!L', server_time // 30),
+                digestmod=hashlib.sha1,
+            ).hexdigest(),
         )
-        buffer = BitArray(8 * 8)
-        buffer[4 * 8:] = int(server_time // 30)
-        signature = hmac.new(
-            key=secret.tobytes(),
-            msg=buffer.tobytes(),
-            digestmod=hashlib.sha1,
-        ).digest()
-        hashed = BitArray(
-            bytes=signature,
-            length=len(signature) * 8,
+
+        value = data[19] & 0xF
+        full_code = (
+            (data[value] & 0x7F) << 24 |       # noqa:W504
+            (data[value + 1] & 0xFF) << 16 |   # noqa:W504
+            (data[value + 2] & 0xFF) << 8 |    # noqa:W504
+            (data[value + 3] & 0xFF)
         )
-        start = hashed[(19 * 8):(19 * 8) + 8] & BitArray('0x0f')
-        slice_ = hashed[start.int * 8:(start.int * 8) + (4 * 8)]
-        fullcode = (slice_ & BitArray("0x7fffffff")).int
-        symbols = '23456789BCDFGHJKMNPQRTVWXY'
+
         code = ''
+        chars = '23456789BCDFGHJKMNPQRTVWXY'
         for _ in range(5):
-            code += symbols[int(fullcode % len(symbols))]
-            fullcode = fullcode / len(symbols)
+            code += chars[full_code % len(chars)]
+            full_code //= len(chars)
+
         return code
 
     def get_confirmation_hash(self, server_time: int, tag: str = 'conf') -> str:
@@ -245,20 +219,20 @@ class Steam(BaseSteam):
         )
         return str(base64.b64encode(encrypted_password), 'utf8')
 
-    async def _update_auth_session(
+    async def _update_auth_session_with_steam_guard(
             self,
             client_id: int,
             steamid: int,
             code: str,
             code_type: EAuthSessionGuardType,
-    ) -> None:
+    ) -> CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response:
         message = CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(
             client_id=client_id,
             steamid=steamid,
             code=code,
             code_type=code_type,
         )
-        await self._requests.request(
+        response = await self._requests.bytes(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/UpdateAuthSessionWithSteamGuardCode/v1',
             data=FormData(
@@ -267,68 +241,79 @@ class Steam(BaseSteam):
                 ],
             ),
         )
+        return CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response.FromString(response)
 
     def _is_twofactor_required(self, confirmation: CAuthentication_AllowedConfirmation) -> bool:
-        return confirmation.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode
+        return confirmation.confirmation_type == k_EAuthSessionGuardType_DeviceCode
+
+    async def _set_additional_cookies(self, urls: List[str]) -> None:
+        tasks = []
+        for url in urls:
+            tasks.append(
+                self._requests.request(
+                    url=URL(url).origin(),
+                    method='GET',
+                )
+            )
+        await asyncio.gather(*tasks)
 
     async def login_to_steam(
             self,
-            platform: EAuthTokenPlatformType = EAuthTokenPlatformType.k_EAuthTokenPlatformType_WebBrowser,
-            persistence: ESessionPersistence = ESessionPersistence.k_ESessionPersistence_Persistent
+            persistence: ESessionPersistence = k_ESessionPersistence_Persistent,
     ) -> Optional[LoginResult]:
-        if await self.is_authorized():
+        if await self.is_alive_session():
             return None
-        if not self._requests.cookies().get('sessionid'):
-            await self._requests.bytes(
-                method='GET',
-                url='https://steamcommunity.com',
-            )
+        await self._requests.request(
+            url='https://steamcommunity.com/',
+            method='GET',
+        )
         keys = await self._getrsakey()
         encrypted_password = self._encrypt_password(keys)
-        auth_session = await self._begin_auth_session(
+        session = await self._begin_auth_session_via_credentials(
             encrypted_password=encrypted_password,
             rsa_timestamp=keys.timestamp,
-            platform=platform,
             persistence=persistence,
         )
-        if auth_session.allowed_confirmations:
-            if self._is_twofactor_required(auth_session.allowed_confirmations[0]):
+        if session.allowed_confirmations:
+            if self._is_twofactor_required(session.allowed_confirmations[0]):
                 server_time = await SteamServerTime.get_time()
-                code = await Steam.get_steam_guard(self.shared_secret, server_time)
-                await self._update_auth_session(
-                    client_id=auth_session.client_id,
-                    steamid=auth_session.steamid,
+                code = await Steam.get_steam_guard(
+                    shared_secret=self._shared_secret,
+                    server_time=server_time,
+                )
+                await self._update_auth_session_with_steam_guard(
+                    client_id=session.client_id,
+                    steamid=session.steamid,
                     code=code,
                     code_type=EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode,
                 )
-        session = await self._poll_auth_session_status(
-            client_id=auth_session.client_id,
-            request_id=auth_session.request_id,
+        session_status = await self._poll_auth_session_status(
+            client_id=session.client_id,
+            request_id=session.request_id,
         )
+        sessionid = self._requests.cookies()['sessionid']
         tokens = await self._finalize_login(
-            refresh_token=session.refresh_token,
-            sessionid=self._requests.cookies()['sessionid'],
+            refresh_token=session_status.refresh_token,
+            sessionid=sessionid,
         )
-        for token in tokens.transfer_info:
-            await self._set_token(
-                url=token.url,
-                nonce=token.params.nonce,
-                auth=token.params.auth,
-                steamid=auth_session.steamid,
-            )
         if not self._steamid and tokens.steamID:
             self._steamid = int(tokens.steamID)
-        cookies = {
-            'steamcommunity.com': self._requests.cookies('steamcommunity.com'),
-        }
-        for url in ('https://store.steampowered.com', 'https://help.steampowered.com'):
-            await self._requests.bytes(url, 'GET')
+        urls = [token.url for token in tokens.transfer_info]
+        await self._set_tokens(self._steamid, tokens.transfer_info)
+        await self._set_additional_cookies(urls)
+        cookies = {}
+        for url in urls:
+            host = parse_url(url).host
             cookies.update({
-                parse_url(url).host: self._requests.cookies(parse_url(url).host),
+                host: self._requests.cookies(host),
             })
-        await self._storage.set(key=self._login, cookies=cookies)
+        await self._storage.set(
+            key=str(self._steamid),
+            platform=self._platform,
+            cookies=cookies,
+        )
         return LoginResult(
-            client_id=auth_session.client_id,
-            refresh_token=session.refresh_token,
-            access_token=session.access_token,
+            client_id=session.client_id,
+            refresh_token=session_status.refresh_token,
+            access_token=session_status.access_token,
         )

@@ -4,7 +4,7 @@ from abc import (
 )
 from typing import (
     Any,
-    Mapping,
+    Dict,
 )
 
 from aiohttp import ClientResponse
@@ -25,5 +25,5 @@ class RequestStrategyAbstract(ABC):
         ...
 
     @abstractmethod
-    def cookies(self, domain: str = 'steamcommunity.com') -> Mapping[str, str]:  # noqa:U100
+    def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:  # noqa:U100
         ...
