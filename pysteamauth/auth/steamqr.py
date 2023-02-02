@@ -9,16 +9,18 @@ from typing import (
 )
 
 from aiohttp import FormData
-from urllib3.util import parse_url
 from yarl import URL
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
+from pysteamauth.auth.helpers import (
+    get_host,
+    pbmessage_to_request,
+)
 from pysteamauth.auth.schemas import LoginResult
 from pysteamauth.auth.steambase import BaseSteam
-from pysteamauth.auth.utils import pbmessage_to_request
 from pysteamauth.pb.enums_pb2 import (
     ESessionPersistence,
     k_ESessionPersistence_Persistent,
@@ -53,7 +55,7 @@ class SteamQR(BaseSteam):
 
     async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         return await self._storage.get(
-            key=self._steamid,
+            key=str(self._steamid),
             domain=domain,
             platform=k_EAuthTokenPlatformType_WebBrowser,
         )
@@ -120,7 +122,7 @@ class SteamQR(BaseSteam):
     async def _set_additional_cookies(self, urls: List[str]) -> None:
         tasks = []
         for url in urls:
-            tasks.append(self._requests.request(URL(url).origin(), 'GET'))
+            tasks.append(self._requests.request(str(URL(url).origin()), 'GET'))
         await asyncio.gather(*tasks)
 
     async def login_to_steam(
@@ -147,7 +149,7 @@ class SteamQR(BaseSteam):
         await self._set_additional_cookies(urls)
         cookies = {}
         for url in urls:
-            host = parse_url(url).host
+            host = get_host(url)
             cookies.update({
                 host: self._requests.cookies(host)
             })

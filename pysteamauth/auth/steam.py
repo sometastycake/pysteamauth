@@ -14,7 +14,6 @@ from typing import (
 import rsa
 from aiohttp import FormData
 from bitstring import BitArray
-from urllib3.util import parse_url
 from yarl import URL
 
 from pysteamauth.abstract import (
@@ -40,12 +39,13 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     k_EAuthTokenPlatformType_WebBrowser,
 )
 
-from .schemas import LoginResult
-from .steambase import BaseSteam
-from .utils import (
+from .helpers import (
+    get_host,
     get_website_id_by_platform,
     pbmessage_to_request,
 )
+from .schemas import LoginResult
+from .steambase import BaseSteam
 
 
 class SteamServerTime:
@@ -87,7 +87,9 @@ class Steam(BaseSteam):
         self._platform = platform
 
     @property
-    def steamid(self) -> Optional[int]:
+    def steamid(self) -> int:
+        if self._steamid is None:
+            raise ValueError('steamid is not specified')
         return self._steamid
 
     @property
@@ -108,13 +110,11 @@ class Steam(BaseSteam):
 
     @property
     def partner_id(self) -> int:
-        if self._steamid is None:
-            raise ValueError('steamid is not specified')
-        return self._steamid - 76561197960265728
+        return self.steamid - 76561197960265728
 
     async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         return await self._storage.get(
-            key=self._steamid,
+            key=str(self.steamid),
             platform=self._platform,
             domain=domain,
         )
@@ -185,8 +185,10 @@ class Steam(BaseSteam):
         return code
 
     def get_confirmation_hash(self, server_time: int, tag: str = 'conf') -> str:
+        if self._identity_secret is None:
+            raise ValueError('identity_secret is not specified')
         identitysecret = base64.b64decode(
-            self.identity_secret,
+            self._identity_secret,
         )
         secret = BitArray(
             bytes=identitysecret,
@@ -249,7 +251,7 @@ class Steam(BaseSteam):
     async def _set_additional_cookies(self, urls: List[str]) -> None:
         tasks = []
         for url in urls:
-            tasks.append(self._requests.request(URL(url).origin(), 'GET'))
+            tasks.append(self._requests.request(str(URL(url).origin()), 'GET'))
         await asyncio.gather(*tasks)
 
     async def login_to_steam(
@@ -268,13 +270,15 @@ class Steam(BaseSteam):
         )
         if session.allowed_confirmations:
             if self._is_twofactor_required(session.allowed_confirmations[0]):
+                if self._shared_secret is None:
+                    raise ValueError('shared_secret is not specified')
                 server_time = await SteamServerTime.get_time()
                 code = await Steam.get_steam_guard(self._shared_secret, server_time)
                 await self._update_auth_session_with_steam_guard(
                     client_id=session.client_id,
                     steamid=session.steamid,
                     code=code,
-                    code_type=EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode,
+                    code_type=k_EAuthSessionGuardType_DeviceCode,
                 )
         session_status = await self._poll_auth_session_status(session.client_id, session.request_id)
         sessionid = self._requests.cookies()['sessionid']
@@ -283,15 +287,17 @@ class Steam(BaseSteam):
             self._steamid = int(tokens.steamID)
         urls = [token.url for token in tokens.transfer_info]
         await self._set_tokens(
-            steamid=self._steamid,
+            steamid=self.steamid,
             transfer_info=tokens.transfer_info,
         )
         await self._set_additional_cookies(urls)
         cookies = {}
         for url in urls:
-            host = parse_url(url).host
-            cookies.update({host: self._requests.cookies(host)})
-        await self._storage.set(str(self._steamid), self._platform, cookies)
+            host = get_host(url)
+            cookies.update({
+                host: self._requests.cookies(host)
+            })
+        await self._storage.set(str(self.steamid), self._platform, cookies)
         return LoginResult(
             client_id=session.client_id,
             refresh_token=session_status.refresh_token,

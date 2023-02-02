@@ -5,7 +5,7 @@ from pysteamauth.abstract.storage import (
     COOKIE_TYPE,
     COOKIES_TYPE,
 )
-from pysteamauth.auth.utils import platform_to_str
+from pysteamauth.auth.helpers import platform_to_str
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import EAuthTokenPlatformType
 
 

@@ -1,5 +1,6 @@
 from typing import ClassVar as _ClassVar
 from typing import Iterable as _Iterable
+from typing import List
 from typing import Mapping as _Mapping
 from typing import Optional as _Optional
 from typing import Union as _Union
@@ -45,7 +46,7 @@ k_EAuthTokenState_Revoked: EAuthTokenState
 
 
 class CAuthenticationSupport_GetTokenHistory_Request(_message.Message):
-    __slots__ = ["token_id"]
+    __slots__: List[str] = ['token_id']
     TOKEN_ID_FIELD_NUMBER: _ClassVar[int]
     token_id: int
 
@@ -53,7 +54,7 @@ class CAuthenticationSupport_GetTokenHistory_Request(_message.Message):
 
 
 class CAuthenticationSupport_GetTokenHistory_Response(_message.Message):
-    __slots__ = ["history"]
+    __slots__: List[str] = ['history']
     HISTORY_FIELD_NUMBER: _ClassVar[int]
     history: _containers.RepeatedCompositeFieldContainer[CSupportRefreshTokenAudit]
 
@@ -61,7 +62,7 @@ class CAuthenticationSupport_GetTokenHistory_Response(_message.Message):
 
 
 class CAuthenticationSupport_QueryRefreshTokenByID_Request(_message.Message):
-    __slots__ = ["token_id"]
+    __slots__: List[str] = ['token_id']
     TOKEN_ID_FIELD_NUMBER: _ClassVar[int]
     token_id: int
 
@@ -69,7 +70,7 @@ class CAuthenticationSupport_QueryRefreshTokenByID_Request(_message.Message):
 
 
 class CAuthenticationSupport_QueryRefreshTokenByID_Response(_message.Message):
-    __slots__ = ["refresh_tokens"]
+    __slots__: List[str] = ['refresh_tokens']
     REFRESH_TOKENS_FIELD_NUMBER: _ClassVar[int]
     refresh_tokens: _containers.RepeatedCompositeFieldContainer[CSupportRefreshTokenDescription]
 
@@ -78,7 +79,7 @@ class CAuthenticationSupport_QueryRefreshTokenByID_Response(_message.Message):
 
 
 class CAuthenticationSupport_QueryRefreshTokensByAccount_Request(_message.Message):
-    __slots__ = ["include_revoked_tokens", "steamid"]
+    __slots__: List[str] = ['include_revoked_tokens', 'steamid']
     INCLUDE_REVOKED_TOKENS_FIELD_NUMBER: _ClassVar[int]
     STEAMID_FIELD_NUMBER: _ClassVar[int]
     include_revoked_tokens: bool
@@ -88,7 +89,7 @@ class CAuthenticationSupport_QueryRefreshTokensByAccount_Request(_message.Messag
 
 
 class CAuthenticationSupport_QueryRefreshTokensByAccount_Response(_message.Message):
-    __slots__ = ["refresh_tokens"]
+    __slots__: List[str] = ['refresh_tokens']
     REFRESH_TOKENS_FIELD_NUMBER: _ClassVar[int]
     refresh_tokens: _containers.RepeatedCompositeFieldContainer[CSupportRefreshTokenDescription]
 
@@ -97,7 +98,7 @@ class CAuthenticationSupport_QueryRefreshTokensByAccount_Response(_message.Messa
 
 
 class CAuthenticationSupport_RevokeToken_Request(_message.Message):
-    __slots__ = ["steamid", "token_id"]
+    __slots__: List[str] = ['steamid', 'token_id']
     STEAMID_FIELD_NUMBER: _ClassVar[int]
     TOKEN_ID_FIELD_NUMBER: _ClassVar[int]
     steamid: int
@@ -107,13 +108,13 @@ class CAuthenticationSupport_RevokeToken_Request(_message.Message):
 
 
 class CAuthenticationSupport_RevokeToken_Response(_message.Message):
-    __slots__ = []
+    __slots__: List[str] = []
 
     def __init__(self) -> None: ...
 
 
 class CAuthentication_AccessToken_GenerateForApp_Request(_message.Message):
-    __slots__ = ["refresh_token", "steamid"]
+    __slots__: List[str] = ['refresh_token', 'steamid']
     REFRESH_TOKEN_FIELD_NUMBER: _ClassVar[int]
     STEAMID_FIELD_NUMBER: _ClassVar[int]
     refresh_token: str
@@ -123,7 +124,7 @@ class CAuthentication_AccessToken_GenerateForApp_Request(_message.Message):
 
 
 class CAuthentication_AccessToken_GenerateForApp_Response(_message.Message):
-    __slots__ = ["access_token"]
+    __slots__: List[str] = ['access_token']
     ACCESS_TOKEN_FIELD_NUMBER: _ClassVar[int]
     access_token: str
 
@@ -131,7 +132,7 @@ class CAuthentication_AccessToken_GenerateForApp_Response(_message.Message):
 
 
 class CAuthentication_AllowedConfirmation(_message.Message):
-    __slots__ = ["associated_message", "confirmation_type"]
+    __slots__: List[str] = ['associated_message', 'confirmation_type']
     ASSOCIATED_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     CONFIRMATION_TYPE_FIELD_NUMBER: _ClassVar[int]
     associated_message: str
@@ -142,8 +143,9 @@ class CAuthentication_AllowedConfirmation(_message.Message):
 
 
 class CAuthentication_BeginAuthSessionViaCredentials_Request(_message.Message):
-    __slots__ = ["account_name", "device_details", "device_friendly_name", "encrypted_password", "encryption_timestamp",
-                 "guard_data", "language", "persistence", "platform_type", "remember_login", "website_id"]
+    __slots__: List[str] = ['account_name', 'device_details', 'device_friendly_name', 'encrypted_password',
+                            'encryption_timestamp',
+                            'guard_data', 'language', 'persistence', 'platform_type', 'remember_login', 'website_id']
     ACCOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
     DEVICE_DETAILS_FIELD_NUMBER: _ClassVar[int]
     DEVICE_FRIENDLY_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -177,8 +179,9 @@ class CAuthentication_BeginAuthSessionViaCredentials_Request(_message.Message):
 
 
 class CAuthentication_BeginAuthSessionViaCredentials_Response(_message.Message):
-    __slots__ = ["agreement_session_url", "allowed_confirmations", "client_id", "extended_error_message", "interval",
-                 "request_id", "steamid", "weak_token"]
+    __slots__: List[str] = ['agreement_session_url', 'allowed_confirmations', 'client_id', 'extended_error_message',
+                            'interval',
+                            'request_id', 'steamid', 'weak_token']
     AGREEMENT_SESSION_URL_FIELD_NUMBER: _ClassVar[int]
     ALLOWED_CONFIRMATIONS_FIELD_NUMBER: _ClassVar[int]
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -204,7 +207,7 @@ class CAuthentication_BeginAuthSessionViaCredentials_Response(_message.Message):
 
 
 class CAuthentication_BeginAuthSessionViaQR_Request(_message.Message):
-    __slots__ = ["device_details", "device_friendly_name", "platform_type", "website_id"]
+    __slots__: List[str] = ['device_details', 'device_friendly_name', 'platform_type', 'website_id']
     DEVICE_DETAILS_FIELD_NUMBER: _ClassVar[int]
     DEVICE_FRIENDLY_NAME_FIELD_NUMBER: _ClassVar[int]
     PLATFORM_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -221,7 +224,7 @@ class CAuthentication_BeginAuthSessionViaQR_Request(_message.Message):
 
 
 class CAuthentication_BeginAuthSessionViaQR_Response(_message.Message):
-    __slots__ = ["allowed_confirmations", "challenge_url", "client_id", "interval", "request_id", "version"]
+    __slots__: List[str] = ['allowed_confirmations', 'challenge_url', 'client_id', 'interval', 'request_id', 'version']
     ALLOWED_CONFIRMATIONS_FIELD_NUMBER: _ClassVar[int]
     CHALLENGE_URL_FIELD_NUMBER: _ClassVar[int]
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -242,7 +245,7 @@ class CAuthentication_BeginAuthSessionViaQR_Response(_message.Message):
 
 
 class CAuthentication_DeviceDetails(_message.Message):
-    __slots__ = ["device_friendly_name", "gaming_device_type", "os_type", "platform_type"]
+    __slots__: List[str] = ['device_friendly_name', 'gaming_device_type', 'os_type', 'platform_type']
     DEVICE_FRIENDLY_NAME_FIELD_NUMBER: _ClassVar[int]
     GAMING_DEVICE_TYPE_FIELD_NUMBER: _ClassVar[int]
     OS_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -258,7 +261,7 @@ class CAuthentication_DeviceDetails(_message.Message):
 
 
 class CAuthentication_GetAuthSessionInfo_Request(_message.Message):
-    __slots__ = ["client_id"]
+    __slots__: List[str] = ['client_id']
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     client_id: int
 
@@ -266,8 +269,9 @@ class CAuthentication_GetAuthSessionInfo_Request(_message.Message):
 
 
 class CAuthentication_GetAuthSessionInfo_Response(_message.Message):
-    __slots__ = ["city", "country", "device_friendly_name", "geoloc", "high_usage_login", "ip", "login_history",
-                 "platform_type", "requested_persistence", "requestor_location_mismatch", "state", "version"]
+    __slots__: List[str] = ['city', 'country', 'device_friendly_name', 'geoloc', 'high_usage_login', 'ip',
+                            'login_history',
+                            'platform_type', 'requested_persistence', 'requestor_location_mismatch', 'state', 'version']
     CITY_FIELD_NUMBER: _ClassVar[int]
     COUNTRY_FIELD_NUMBER: _ClassVar[int]
     DEVICE_FRIENDLY_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -303,13 +307,13 @@ class CAuthentication_GetAuthSessionInfo_Response(_message.Message):
 
 
 class CAuthentication_GetAuthSessionsForAccount_Request(_message.Message):
-    __slots__ = []
+    __slots__: List[str] = []
 
     def __init__(self) -> None: ...
 
 
 class CAuthentication_GetAuthSessionsForAccount_Response(_message.Message):
-    __slots__ = ["client_ids"]
+    __slots__: List[str] = ['client_ids']
     CLIENT_IDS_FIELD_NUMBER: _ClassVar[int]
     client_ids: _containers.RepeatedScalarFieldContainer[int]
 
@@ -317,7 +321,7 @@ class CAuthentication_GetAuthSessionsForAccount_Response(_message.Message):
 
 
 class CAuthentication_GetPasswordRSAPublicKey_Request(_message.Message):
-    __slots__ = ["account_name"]
+    __slots__: List[str] = ['account_name']
     ACCOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
     account_name: str
 
@@ -325,7 +329,7 @@ class CAuthentication_GetPasswordRSAPublicKey_Request(_message.Message):
 
 
 class CAuthentication_GetPasswordRSAPublicKey_Response(_message.Message):
-    __slots__ = ["publickey_exp", "publickey_mod", "timestamp"]
+    __slots__: List[str] = ['publickey_exp', 'publickey_mod', 'timestamp']
     PUBLICKEY_EXP_FIELD_NUMBER: _ClassVar[int]
     PUBLICKEY_MOD_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
@@ -338,7 +342,7 @@ class CAuthentication_GetPasswordRSAPublicKey_Response(_message.Message):
 
 
 class CAuthentication_MigrateMobileSession_Request(_message.Message):
-    __slots__ = ["signature", "steamid", "token"]
+    __slots__: List[str] = ['signature', 'steamid', 'token']
     SIGNATURE_FIELD_NUMBER: _ClassVar[int]
     STEAMID_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
@@ -351,7 +355,7 @@ class CAuthentication_MigrateMobileSession_Request(_message.Message):
 
 
 class CAuthentication_MigrateMobileSession_Response(_message.Message):
-    __slots__ = ["access_token", "refresh_token"]
+    __slots__: List[str] = ['access_token', 'refresh_token']
     ACCESS_TOKEN_FIELD_NUMBER: _ClassVar[int]
     REFRESH_TOKEN_FIELD_NUMBER: _ClassVar[int]
     access_token: str
@@ -361,7 +365,7 @@ class CAuthentication_MigrateMobileSession_Response(_message.Message):
 
 
 class CAuthentication_PollAuthSessionStatus_Request(_message.Message):
-    __slots__ = ["client_id", "request_id", "token_to_revoke"]
+    __slots__: List[str] = ['client_id', 'request_id', 'token_to_revoke']
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     TOKEN_TO_REVOKE_FIELD_NUMBER: _ClassVar[int]
@@ -374,8 +378,15 @@ class CAuthentication_PollAuthSessionStatus_Request(_message.Message):
 
 
 class CAuthentication_PollAuthSessionStatus_Response(_message.Message):
-    __slots__ = ["access_token", "account_name", "had_remote_interaction", "new_challenge_url", "new_client_id",
-                 "new_guard_data", "refresh_token"]
+    __slots__: List[str] = [
+        'access_token',
+        'account_name',
+        'had_remote_interaction',
+        'new_challenge_url',
+        'new_client_id',
+        'new_guard_data',
+        'refresh_token'
+    ]
     ACCESS_TOKEN_FIELD_NUMBER: _ClassVar[int]
     ACCOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
     HAD_REMOTE_INTERACTION_FIELD_NUMBER: _ClassVar[int]
@@ -398,17 +409,18 @@ class CAuthentication_PollAuthSessionStatus_Response(_message.Message):
 
 
 class CAuthentication_RefreshToken_Enumerate_Request(_message.Message):
-    __slots__ = []
+    __slots__: List[str] = []
 
     def __init__(self) -> None: ...
 
 
 class CAuthentication_RefreshToken_Enumerate_Response(_message.Message):
-    __slots__ = ["refresh_tokens", "requesting_token"]
+    __slots__: List[str] = ['refresh_tokens', 'requesting_token']
 
     class RefreshTokenDescription(_message.Message):
-        __slots__ = ["auth_type", "first_seen", "gaming_device_type", "last_seen", "logged_in", "os_platform",
-                     "os_type", "platform_type", "time_updated", "token_description", "token_id"]
+        __slots__: List[str] = ['auth_type', 'first_seen', 'gaming_device_type', 'last_seen', 'logged_in',
+                                'os_platform',
+                                'os_type', 'platform_type', 'time_updated', 'token_description', 'token_id']
         AUTH_TYPE_FIELD_NUMBER: _ClassVar[int]
         FIRST_SEEN_FIELD_NUMBER: _ClassVar[int]
         GAMING_DEVICE_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -443,7 +455,7 @@ class CAuthentication_RefreshToken_Enumerate_Response(_message.Message):
                      os_type: _Optional[int] = ...) -> None: ...
 
     class TokenUsageEvent(_message.Message):
-        __slots__ = ["city", "country", "ip", "locale", "state", "time"]
+        __slots__: List[str] = ['city', 'country', 'ip', 'locale', 'state', 'time']
         CITY_FIELD_NUMBER: _ClassVar[int]
         COUNTRY_FIELD_NUMBER: _ClassVar[int]
         IP_FIELD_NUMBER: _ClassVar[int]
@@ -474,7 +486,7 @@ class CAuthentication_RefreshToken_Enumerate_Response(_message.Message):
 
 
 class CAuthentication_RefreshToken_Revoke_Request(_message.Message):
-    __slots__ = ["revoke_action", "signature", "steamid", "token_id"]
+    __slots__: List[str] = ['revoke_action', 'signature', 'steamid', 'token_id']
     REVOKE_ACTION_FIELD_NUMBER: _ClassVar[int]
     SIGNATURE_FIELD_NUMBER: _ClassVar[int]
     STEAMID_FIELD_NUMBER: _ClassVar[int]
@@ -490,13 +502,13 @@ class CAuthentication_RefreshToken_Revoke_Request(_message.Message):
 
 
 class CAuthentication_RefreshToken_Revoke_Response(_message.Message):
-    __slots__ = []
+    __slots__: List[str] = []
 
     def __init__(self) -> None: ...
 
 
 class CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request(_message.Message):
-    __slots__ = ["client_id", "confirm", "persistence", "signature", "steamid", "version"]
+    __slots__: List[str] = ['client_id', 'confirm', 'persistence', 'signature', 'steamid', 'version']
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     CONFIRM_FIELD_NUMBER: _ClassVar[int]
     PERSISTENCE_FIELD_NUMBER: _ClassVar[int]
@@ -516,13 +528,13 @@ class CAuthentication_UpdateAuthSessionWithMobileConfirmation_Request(_message.M
 
 
 class CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response(_message.Message):
-    __slots__ = []
+    __slots__: List[str] = []
 
     def __init__(self) -> None: ...
 
 
 class CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(_message.Message):
-    __slots__ = ["client_id", "code", "code_type", "steamid"]
+    __slots__: List[str] = ['client_id', 'code', 'code_type', 'steamid']
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     CODE_FIELD_NUMBER: _ClassVar[int]
     CODE_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -537,7 +549,7 @@ class CAuthentication_UpdateAuthSessionWithSteamGuardCode_Request(_message.Messa
 
 
 class CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response(_message.Message):
-    __slots__ = ["agreement_session_url"]
+    __slots__: List[str] = ['agreement_session_url']
     AGREEMENT_SESSION_URL_FIELD_NUMBER: _ClassVar[int]
     agreement_session_url: str
 
@@ -545,7 +557,7 @@ class CAuthentication_UpdateAuthSessionWithSteamGuardCode_Response(_message.Mess
 
 
 class CCloudGaming_CreateNonce_Request(_message.Message):
-    __slots__ = ["appid", "platform"]
+    __slots__: List[str] = ['appid', 'platform']
     APPID_FIELD_NUMBER: _ClassVar[int]
     PLATFORM_FIELD_NUMBER: _ClassVar[int]
     appid: int
@@ -555,7 +567,7 @@ class CCloudGaming_CreateNonce_Request(_message.Message):
 
 
 class CCloudGaming_CreateNonce_Response(_message.Message):
-    __slots__ = ["expiry", "nonce"]
+    __slots__: List[str] = ['expiry', 'nonce']
     EXPIRY_FIELD_NUMBER: _ClassVar[int]
     NONCE_FIELD_NUMBER: _ClassVar[int]
     expiry: int
@@ -565,7 +577,7 @@ class CCloudGaming_CreateNonce_Response(_message.Message):
 
 
 class CCloudGaming_GetTimeRemaining_Request(_message.Message):
-    __slots__ = ["appid_list", "platform"]
+    __slots__: List[str] = ['appid_list', 'platform']
     APPID_LIST_FIELD_NUMBER: _ClassVar[int]
     PLATFORM_FIELD_NUMBER: _ClassVar[int]
     appid_list: _containers.RepeatedScalarFieldContainer[int]
@@ -575,7 +587,7 @@ class CCloudGaming_GetTimeRemaining_Request(_message.Message):
 
 
 class CCloudGaming_GetTimeRemaining_Response(_message.Message):
-    __slots__ = ["entries"]
+    __slots__: List[str] = ['entries']
     ENTRIES_FIELD_NUMBER: _ClassVar[int]
     entries: _containers.RepeatedCompositeFieldContainer[CCloudGaming_TimeRemaining]
 
@@ -583,7 +595,7 @@ class CCloudGaming_GetTimeRemaining_Response(_message.Message):
 
 
 class CCloudGaming_TimeRemaining(_message.Message):
-    __slots__ = ["appid", "minutes_remaining"]
+    __slots__: List[str] = ['appid', 'minutes_remaining']
     APPID_FIELD_NUMBER: _ClassVar[int]
     MINUTES_REMAINING_FIELD_NUMBER: _ClassVar[int]
     appid: int
@@ -593,7 +605,7 @@ class CCloudGaming_TimeRemaining(_message.Message):
 
 
 class CSupportRefreshTokenAudit(_message.Message):
-    __slots__ = ["action", "actor", "ip", "time"]
+    __slots__: List[str] = ['action', 'actor', 'ip', 'time']
     ACTION_FIELD_NUMBER: _ClassVar[int]
     ACTOR_FIELD_NUMBER: _ClassVar[int]
     IP_FIELD_NUMBER: _ClassVar[int]
@@ -609,11 +621,12 @@ class CSupportRefreshTokenAudit(_message.Message):
 
 
 class CSupportRefreshTokenDescription(_message.Message):
-    __slots__ = ["auth_type", "first_seen", "gaming_device_type", "last_seen", "os_platform", "os_type",
-                 "owner_steamid", "platform_type", "time_updated", "token_description", "token_id", "token_state"]
+    __slots__: List[str] = ['auth_type', 'first_seen', 'gaming_device_type', 'last_seen', 'os_platform', 'os_type',
+                            'owner_steamid', 'platform_type', 'time_updated', 'token_description', 'token_id',
+                            'token_state']
 
     class TokenUsageEvent(_message.Message):
-        __slots__ = ["city", "country", "ip", "state", "time"]
+        __slots__: List[str] = ['city', 'country', 'ip', 'state', 'time']
         CITY_FIELD_NUMBER: _ClassVar[int]
         COUNTRY_FIELD_NUMBER: _ClassVar[int]
         IP_FIELD_NUMBER: _ClassVar[int]
@@ -667,7 +680,7 @@ class CSupportRefreshTokenDescription(_message.Message):
 
 
 class EAuthTokenPlatformType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = [
+    __slots__: List[str] = [
         'k_EAuthTokenPlatformType_MobileApp',
         'k_EAuthTokenPlatformType_SteamClient',
         'k_EAuthTokenPlatformType_Unknown',
@@ -676,16 +689,16 @@ class EAuthTokenPlatformType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 
 
 class EAuthSessionGuardType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EAuthSessionSecurityHistory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EAuthTokenRevokeAction(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EAuthTokenState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []

@@ -1,4 +1,5 @@
 from typing import ClassVar as _ClassVar
+from typing import List
 
 from google.protobuf import descriptor as _descriptor
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -269,163 +270,163 @@ k_SystemFanControlMode_Invalid: ESystemFanControlMode
 
 
 class EPublishedFileQueryType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EPublishedFileInappropriateProvider(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EPublishedFileInappropriateResult(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EPersonaStateFlag(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EContentCheckProvider(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EProfileCustomizationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EPublishedFileStorageSystem(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ECloudStoragePersistState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESDCardFormatStage(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemFanControlMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EColorProfile(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EBluetoothDeviceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemAudioDirection(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemAudioChannel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemAudioPortType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemAudioPortDirection(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemServiceState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EGraphicsPerfOverlayLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EGPUPerformanceLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EScalingFilter(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESplitScalingFilter(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESplitScalingScaler(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ECPUGovernor(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EUpdaterType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EUpdaterState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EStorageBlockContentType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EStorageBlockFileSystemType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EStorageDriveMediaType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESystemDisplayCompatibilityMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESteamDeckCompatibilityCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESteamDeckCompatibilityResultDisplayType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EACState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EBatteryState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EOSBranch(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ECommunityItemClass(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESteamDeckCompatibilityFeedback(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class EProvideDeckFeedbackPreference(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ETouchGesture(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []
 
 
 class ESessionPersistence(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = [
+    __slots__: List[str] = [
         'k_ESessionPersistence_Ephemeral',
         'k_ESessionPersistence_Persistent',
     ]
 
 
 class ENewSteamAnnouncementState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []

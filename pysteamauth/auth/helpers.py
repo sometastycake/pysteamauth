@@ -1,6 +1,7 @@
 import base64
 
 from google.protobuf.message import Message
+from urllib3.util import parse_url
 
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     EAuthTokenPlatformType,
@@ -34,3 +35,10 @@ def get_website_id_by_platform(platform: EAuthTokenPlatformType) -> str:
         return 'Community'
     else:
         raise ValueError('Unknown platform type')
+
+
+def get_host(url: str) -> str:
+    host = parse_url(url).host
+    if host is None:
+        raise ValueError(f'Host is None of URL "{url}"')
+    return host

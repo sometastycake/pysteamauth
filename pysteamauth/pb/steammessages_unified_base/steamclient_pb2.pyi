@@ -1,4 +1,5 @@
 from typing import ClassVar as _ClassVar
+from typing import List
 
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pb2 as _descriptor_pb2
@@ -23,8 +24,8 @@ service_description: _descriptor.FieldDescriptor
 service_execution_site: _descriptor.FieldDescriptor
 
 class NoResponse(_message.Message):
-    __slots__ = []
+    __slots__: List[str] = []
     def __init__(self) -> None: ...
 
 class EProtoExecutionSite(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__: List[str] = []

@@ -13,18 +13,20 @@ from aiohttp import (
     ClientResponse,
     FormData,
 )
-from urllib3.util import parse_url
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
+)
+from pysteamauth.auth.helpers import (
+    get_host,
+    pbmessage_to_request,
 )
 from pysteamauth.auth.schemas import (
     EnumerateTokensModel,
     FinalizeLoginStatus,
     TransferInfoItem,
 )
-from pysteamauth.auth.utils import pbmessage_to_request
 from pysteamauth.base import (
     BaseCookieStorage,
     BaseRequestStrategy,
@@ -69,7 +71,7 @@ class BaseSteam:
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         cookies = await self.cookies(
-            domain=parse_url(url).host,
+            domain=get_host(url),
         )
         return await self._requests.text(
             url=url,
