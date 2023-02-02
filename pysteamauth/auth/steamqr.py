@@ -1,22 +1,18 @@
-import asyncio
 import base64
 import hashlib
 import hmac
 from typing import (
     Dict,
-    List,
     Optional,
 )
 
 from aiohttp import FormData
-from yarl import URL
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
 from pysteamauth.auth.helpers import (
-    get_host,
     pbmessage_to_request,
 )
 from pysteamauth.auth.schemas import LoginResult
@@ -119,12 +115,6 @@ class SteamQR(BaseSteam):
         )
         return CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response.FromString(response)
 
-    async def _set_additional_cookies(self, urls: List[str]) -> None:
-        tasks = []
-        for url in urls:
-            tasks.append(self._requests.request(str(URL(url).origin()), 'GET'))
-        await asyncio.gather(*tasks)
-
     async def login_to_steam(
             self,
             persistence: ESessionPersistence = k_ESessionPersistence_Persistent,
@@ -141,18 +131,12 @@ class SteamQR(BaseSteam):
         session_status = await self._poll_auth_session_status(session.client_id, session.request_id)
         sessionid = self._requests.cookies()['sessionid']
         tokens = await self._finalize_login(session_status.refresh_token, sessionid)
-        urls = [token.url for token in tokens.transfer_info]
         await self._set_tokens(
             steamid=self._steamid,
             transfer_info=tokens.transfer_info,
         )
-        await self._set_additional_cookies(urls)
-        cookies = {}
-        for url in urls:
-            host = get_host(url)
-            cookies.update({
-                host: self._requests.cookies(host)
-            })
+        urls = [token.url for token in tokens.transfer_info]
+        cookies = await self._cookies_processing(urls)
         await self._storage.set(str(self.steamid), k_EAuthTokenPlatformType_WebBrowser, cookies)
         return LoginResult(
             client_id=session.client_id,

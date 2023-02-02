@@ -13,11 +13,13 @@ from aiohttp import (
     ClientResponse,
     FormData,
 )
+from yarl import URL
 
 from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
+from pysteamauth.abstract.storage import COOKIES_TYPE
 from pysteamauth.auth.helpers import (
     get_host,
     pbmessage_to_request,
@@ -142,6 +144,19 @@ class BaseSteam:
         form.add_field('auth', auth)
         form.add_field('steamID', str(steamid))
         return await self._requests.request(url, 'POST', data=form)
+
+    async def _cookies_processing(self, urls: List[str]) -> COOKIES_TYPE:
+        tasks = []
+        for url in urls:
+            tasks.append(self._requests.request(str(URL(url).origin()), 'GET'))
+        await asyncio.gather(*tasks)
+        cookies = {}
+        for url in urls:
+            host = get_host(url)
+            cookies.update({
+                host: self._requests.cookies(host)
+            })
+        return cookies
 
     async def enumerate_tokens(
             self,

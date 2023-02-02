@@ -40,7 +40,6 @@ from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
 )
 
 from .helpers import (
-    get_host,
     get_website_id_by_platform,
     pbmessage_to_request,
 )
@@ -285,18 +284,12 @@ class Steam(BaseSteam):
         tokens = await self._finalize_login(session_status.refresh_token, sessionid)
         if not self._steamid and tokens.steamID:
             self._steamid = int(tokens.steamID)
-        urls = [token.url for token in tokens.transfer_info]
         await self._set_tokens(
             steamid=self.steamid,
             transfer_info=tokens.transfer_info,
         )
-        await self._set_additional_cookies(urls)
-        cookies = {}
-        for url in urls:
-            host = get_host(url)
-            cookies.update({
-                host: self._requests.cookies(host)
-            })
+        urls = [token.url for token in tokens.transfer_info]
+        cookies = await self._cookies_processing(urls)
         await self._storage.set(str(self.steamid), self._platform, cookies)
         return LoginResult(
             client_id=session.client_id,
