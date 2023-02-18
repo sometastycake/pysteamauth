@@ -5,7 +5,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Union,
 )
 
 import aiohttp
@@ -19,13 +18,8 @@ from pysteamauth.abstract import (
     CookieStorageAbstract,
     RequestStrategyAbstract,
 )
-from pysteamauth.abstract.storage import COOKIES_TYPE
-from pysteamauth.auth.helpers import (
-    get_host,
-    pbmessage_to_request,
-)
+from pysteamauth.auth.helpers import pbmessage_to_request
 from pysteamauth.auth.schemas import (
-    EnumerateTokensModel,
     FinalizeLoginStatus,
     TransferInfoItem,
 )
@@ -73,7 +67,7 @@ class BaseSteam:
 
     async def request(self, url: str, method: str = 'GET', **kwargs: Any) -> str:
         cookies = await self.cookies(
-            domain=get_host(url),
+            domain=URL(url).raw_host,
         )
         return await self._requests.text(
             url=url,
@@ -145,24 +139,7 @@ class BaseSteam:
         form.add_field('steamID', str(steamid))
         return await self._requests.request(url, 'POST', data=form)
 
-    async def _cookies_processing(self, urls: List[str]) -> COOKIES_TYPE:
-        tasks = []
-        for url in urls:
-            tasks.append(self._requests.request(str(URL(url).origin()), 'GET'))
-        await asyncio.gather(*tasks)
-        cookies = {}
-        for url in urls:
-            host = get_host(url)
-            cookies.update({
-                host: self._requests.cookies(host)
-            })
-        return cookies
-
-    async def enumerate_tokens(
-            self,
-            access_key: str,
-            return_model: bool = False,
-    ) -> Union[Dict, EnumerateTokensModel]:
+    async def enumerate_tokens(self, access_key: str) -> Dict:
         response = await self._requests.text(
             method='POST',
             url='https://api.steampowered.com/IAuthenticationService/EnumerateTokens/v1',
@@ -170,8 +147,6 @@ class BaseSteam:
                 'access_token': access_key,
             },
         )
-        if return_model:
-            return EnumerateTokensModel.parse_raw(response)
         return json.loads(response)
 
     async def refresh_access_token(

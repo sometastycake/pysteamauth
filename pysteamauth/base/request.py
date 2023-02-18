@@ -1,6 +1,5 @@
 from typing import (
     Any,
-    Dict,
     Optional,
 )
 
@@ -9,6 +8,8 @@ from aiohttp import (
     ClientResponse,
     ClientSession,
 )
+from aiohttp.abc import AbstractCookieJar
+from aiohttp.typedefs import StrOrURL
 
 from pysteamauth.abstract import RequestStrategyAbstract
 from pysteamauth.errors import check_steam_error
@@ -38,7 +39,7 @@ class BaseRequestStrategy(RequestStrategyAbstract):
             kwargs['connector'] = aiohttp.TCPConnector(ssl=False)
         return aiohttp.ClientSession(**kwargs)
 
-    async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:
+    async def request(self, url: StrOrURL, method: str, **kwargs: Any) -> ClientResponse:
         if self._session is None:
             self._session = self._create_session()
         response = await self._session.request(method, url, **kwargs)
@@ -47,17 +48,14 @@ class BaseRequestStrategy(RequestStrategyAbstract):
             check_steam_error(int(error))
         return response
 
-    def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
+    @property
+    def cookies(self) -> AbstractCookieJar:
         if self._session is None:
             raise RuntimeError('Session is not initialized')
-        cookies = {}
-        for cookie in self._session.cookie_jar:
-            if cookie['domain'] == domain:
-                cookies[cookie.key] = cookie.value
-        return cookies
+        return self._session.cookie_jar
 
-    async def text(self, url: str, method: str, **kwargs: Any) -> str:
+    async def text(self, url: StrOrURL, method: str, **kwargs: Any) -> str:
         return await (await self.request(url, method, **kwargs)).text()
 
-    async def bytes(self, url: str, method: str, **kwargs: Any) -> bytes:
+    async def bytes(self, url: StrOrURL, method: str, **kwargs: Any) -> bytes:
         return await (await self.request(url, method, **kwargs)).read()

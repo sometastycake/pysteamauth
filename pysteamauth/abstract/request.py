@@ -2,28 +2,28 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from typing import (
-    Any,
-    Dict,
-)
+from typing import Any
 
 from aiohttp import ClientResponse
+from aiohttp.abc import AbstractCookieJar
+from aiohttp.typedefs import StrOrURL
 
 
 class RequestStrategyAbstract(ABC):
 
+    @property
     @abstractmethod
-    async def request(self, url: str, method: str, **kwargs: Any) -> ClientResponse:  # noqa:U100
+    def cookies(self) -> AbstractCookieJar:
         ...
 
     @abstractmethod
-    async def text(self, url: str, method: str, **kwargs: Any) -> str:  # noqa:U100
+    async def request(self, url: StrOrURL, method: str, **kwargs: Any) -> ClientResponse:
         ...
 
     @abstractmethod
-    async def bytes(self, url: str, method: str, **kwargs: Any) -> bytes:  # noqa:U100
+    async def text(self, url: StrOrURL, method: str, **kwargs: Any) -> str:
         ...
 
     @abstractmethod
-    def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:  # noqa:U100
+    async def bytes(self, url: StrOrURL, method: str, **kwargs: Any) -> bytes:
         ...

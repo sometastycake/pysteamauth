@@ -1,7 +1,10 @@
 import base64
+import random
+from typing import Dict
 
+from aiohttp.abc import AbstractCookieJar
 from google.protobuf.message import Message
-from urllib3.util import parse_url
+from yarl import URL
 
 from pysteamauth.pb.steammessages_auth.steamclient_pb2 import (
     EAuthTokenPlatformType,
@@ -37,8 +40,21 @@ def get_website_id_by_platform(platform: EAuthTokenPlatformType) -> str:
         raise ValueError('Unknown platform type')
 
 
-def get_host(url: str) -> str:
-    host = parse_url(url).host
-    if host is None:
-        raise ValueError(f'Host is None of URL "{url}"')
-    return host
+def get_cookies_by_url(cookie_jar: AbstractCookieJar, url: URL) -> Dict[str, str]:
+    cookies = cookie_jar.filter_cookies(url)
+    return {name: cookie.value for name, cookie in cookies.items()}
+
+
+def get_cookies(cookie_jar: AbstractCookieJar) -> Dict[str, Dict[str, str]]:
+    cookies = {}
+    for cookie in cookie_jar:
+        domain = cookie['domain']
+        if domain not in cookies:
+            cookies[domain] = {}
+        cookies[domain].update({cookie.key: cookie.value})
+    return cookies
+
+
+def generate_sessionid() -> str:
+    choices = '0123456789abcdef'
+    return ''.join([random.choice(choices) for _ in range(24)])

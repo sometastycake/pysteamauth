@@ -683,7 +683,6 @@ class EAuthTokenPlatformType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__: List[str] = [
         'k_EAuthTokenPlatformType_MobileApp',
         'k_EAuthTokenPlatformType_SteamClient',
-        'k_EAuthTokenPlatformType_Unknown',
         'k_EAuthTokenPlatformType_WebBrowser',
     ]
 
