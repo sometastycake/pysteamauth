@@ -65,7 +65,7 @@ class Steam(BaseSteam):
         self,
         login: str,
         password: str,
-        steamid: Optional[int] = None,
+        steamid: int,
         shared_secret: Optional[str] = None,
         identity_secret: Optional[str] = None,
         device_id: Optional[str] = None,
@@ -84,8 +84,6 @@ class Steam(BaseSteam):
 
     @property
     def steamid(self) -> int:
-        if self._steamid is None:
-            raise ValueError('steamid is not specified')
         return self._steamid
 
     @property
@@ -106,11 +104,17 @@ class Steam(BaseSteam):
 
     @property
     def partner_id(self) -> int:
-        return self.steamid - 76561197960265728
+        return self._steamid - 76561197960265728
+
+    async def __aenter__(self) -> 'Steam':
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:  # type:ignore
+        await self._requests.close()
 
     async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         return await self._storage.get(
-            key=self._login,
+            key=str(self._steamid),
             platform=self._platform,
             domain=domain,
         )
@@ -242,7 +246,7 @@ class Steam(BaseSteam):
 
     async def _confirm_authorization(self, session: CAuthentication_BeginAuthSessionViaCredentials_Response) -> None:
         """
-        Confirmation authorization via Steam Guard
+        Confirmation authorization via Steam Guard.
         """
         if session.allowed_confirmations[0].confirmation_type != k_EAuthSessionGuardType_DeviceCode:
             return
@@ -287,7 +291,7 @@ class Steam(BaseSteam):
             self._requests.request(URL(token.url).origin(), 'GET') for token in tokens.transfer_info
         ])
         await self._storage.set(
-            key=self._login,
+            key=str(self._steamid),
             platform=self._platform,
             cookies=get_cookies(self._requests.cookies),
         )

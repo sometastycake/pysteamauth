@@ -50,6 +50,12 @@ class SteamQR(BaseSteam):
     def steamid(self) -> int:
         return self._steamid
 
+    async def __aenter__(self) -> 'SteamQR':
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:  # type:ignore
+        await self._requests.close()
+
     async def cookies(self, domain: str = 'steamcommunity.com') -> Dict[str, str]:
         return await self._storage.get(
             key=str(self._steamid),

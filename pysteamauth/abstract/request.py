@@ -11,6 +11,10 @@ from aiohttp.typedefs import StrOrURL
 
 class RequestStrategyAbstract(ABC):
 
+    @abstractmethod
+    async def close(self) -> None:
+        ...
+
     @property
     @abstractmethod
     def cookies(self) -> AbstractCookieJar:

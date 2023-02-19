@@ -21,9 +21,9 @@ class BaseRequestStrategy(RequestStrategyAbstract):
         self._session_kwargs = session_kwargs
         self._session: Optional[ClientSession] = None
 
-    def __del__(self):
+    async def close(self) -> None:
         if self._session:
-            self._session.connector.close()
+            await self._session.close()
 
     def _create_session(self) -> ClientSession:
         """
