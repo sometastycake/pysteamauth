@@ -113,11 +113,11 @@ class SteamQR(BaseSteam):
         )
         return CAuthentication_UpdateAuthSessionWithMobileConfirmation_Response.FromString(response)
 
-    async def login_to_steam(self) -> Optional[LoginResult]:
+    async def login_to_steam(self, force: bool = False) -> Optional[LoginResult]:
         """
         Login to Steam.
         """
-        if await self.is_alive_session():
+        if await self.is_alive_session() and not force:
             return None
         self._requests.cookies.clear()
         session = await self._begin_auth_session_via_qr()
