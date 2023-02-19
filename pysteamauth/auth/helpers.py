@@ -49,6 +49,8 @@ def get_cookies(cookie_jar: AbstractCookieJar) -> Dict[str, Dict[str, str]]:
     cookies = {}
     for cookie in cookie_jar:
         domain = cookie['domain']
+        if domain not in ('steamcommunity.com', 'store.steampowered.com', 'help.steampowered.com', 'steam.tv'):
+            continue
         if domain not in cookies:
             cookies[domain] = {}
         cookies[domain].update({cookie.key: cookie.value})
