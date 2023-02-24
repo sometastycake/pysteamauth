@@ -1,6 +1,6 @@
 # Asynchronous python library for Steam authorization using protobuf
 
-[![pypi: package](https://img.shields.io/badge/pypi-1.0.0-blue)](https://pypi.org/project/pysteamauth/)
+[![pypi: package](https://img.shields.io/badge/pypi-2.0.0a1-blue)](https://pypi.org/project/pysteamauth/)
 [![Python: versions](
 https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue)]()
 
@@ -16,19 +16,22 @@ pip install pysteamauth
 
 ```python
 from pysteamauth.auth import Steam
+from pysteamauth.auth.schemas import LoginResult
 
 
 async def main():
     steam = Steam(
         login='login', 
         password='password',
+        steamid=76560000000000000,
     )
     
-    await steam.login_to_steam()
+    result: LoginResult = await steam.login_to_steam()
 
-    await steam.request('https://steamcommunity.com')
-    await steam.request('https://store.steampowered.com')
-    await steam.request('https://help.steampowered.com')
+    response: str = await steam.request(
+        url='https://steamcommunity.com',
+        method='GET',
+    )
 ```
 
 ## If account have Steam Guard
@@ -40,6 +43,7 @@ steam = Steam(
     login='login',
     password='password',
     shared_secret='shared_secret',
+    steamid=76560000000000000,
 )
 ```
 
@@ -53,19 +57,20 @@ import json
 from typing import Dict
 
 from aioredis import Redis
-from pysteamauth.abstract import CookieStorageAbstract
+
 from pysteamauth.auth import Steam
+from pysteamauth.base import BaseCookieStorage
+from pysteamauth.pb.steammessages_auth.steamclient_pb2 import EAuthTokenPlatformType
 
 
-class RedisStorage(CookieStorageAbstract):
-
+class RedisStorage(BaseCookieStorage):
     redis = Redis()
 
-    async def set(self, login: str, cookies: Dict) -> None:
-        await self.redis.set(login, json.dumps(cookies))
+    async def set(self, key: str, platform: EAuthTokenPlatformType, cookies: Dict) -> None:
+        await self.redis.set(self._key(key, platform), json.dumps(cookies))
 
-    async def get(self, login: str, domain: str) -> Dict:
-        cookies = await self.redis.get(login)
+    async def get(self, key: str, platform: EAuthTokenPlatformType, domain: str) -> Dict:
+        cookies = await self.redis.get(self._key(key, platform))
         if not cookies:
             return {}
         return json.loads(cookies).get(domain, {})
@@ -75,9 +80,10 @@ async def main():
     steam = Steam(
         login='login',
         password='password',
+        steamid=76560000000000000,
         cookie_storage=RedisStorage(),
     )
-    
+
     await steam.login_to_steam()
 ```
 
@@ -90,7 +96,7 @@ from pysteamauth.errors import SteamError
 
 async def main():
     try:
-        await Steam('login', 'password').login_to_steam()
+        await Steam('login', 'password', 76560000000000000).login_to_steam()
     except SteamError as error:
         print(error)
 ```
@@ -118,7 +124,7 @@ custom_error_exception({
 
 async def main():
     try:
-        await Steam('login', 'password').login_to_steam()
+        await Steam('login', 'password', 76560000000000000).login_to_steam()
     except LoginError as error:
         print(error)
 ```
