@@ -14,7 +14,7 @@ requirements = [
 
 setup(
     name='pysteamauth',
-    version='2.0.0a2',
+    version='2.0.0a3',
     url='https://github.com/sometastycake/pysteamauth',
     license='MIT',
     author='Mike M',
@@ -28,4 +28,21 @@ setup(
     install_requires=requirements,
     setup_requires=requirements,
     include_package_data=True,
+    data_files=[
+        (
+            'pysteamauth/pb/steammessages_auth',
+            ['pysteamauth/pb/steammessages_auth/steamclient_pb2.pyi']
+        ),
+        (
+            'pysteamauth/pb/steammessages_unified_base',
+            ['pysteamauth/pb/steammessages_unified_base/steamclient_pb2.pyi']
+        ),
+        (
+            'pysteamauth/pb',
+            [
+                'pysteamauth/pb/enums_pb2.pyi',
+                'pysteamauth/pb/steammessages_base_pb2.pyi',
+            ]
+        )
+    ]
 )
