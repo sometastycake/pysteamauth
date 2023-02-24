@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.0.0a1 (2023-02-24)](https://github.com/sometastycake/pysteamauth/releases/tag/v2.0.0a1)
+
+- Added new proto files versions
+- Added stubs for proto files
+- New `SteamQR` class for authorization using QR code
+- Added ability of authorization with specified platform (WebBrowser, Client, Mobile)
+- Cookie storage uses platform value as part of key
+- Default cookie storage key is `{steamid}_{platform}`
+- Authorization requires steamid of Steam account
+- Changed method of getting cookies
+- Added `BaseSteam` class
+
 ## [v1.0.0 (2023-01-22)](https://github.com/sometastycake/pysteamauth/releases/tag/v1.0.0)
 
 - `get_steam_guard` method is classmethod now
