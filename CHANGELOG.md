@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.0.0a1 (2023-02-24)](https://github.com/sometastycake/pysteamauth/releases/tag/v2.0.0a1)
+## [v2.0.0a2 (2023-02-25)](https://github.com/sometastycake/pysteamauth/releases/tag/v2.0.0a2)
 
 - Added new proto files versions
 - Added stubs for proto files

@@ -1,6 +1,6 @@
 # Asynchronous python library for Steam authorization using protobuf
 
-[![pypi: package](https://img.shields.io/badge/pypi-2.0.0a1-blue)](https://pypi.org/project/pysteamauth/)
+[![pypi: package](https://img.shields.io/badge/pypi-2.0.0a2-blue)](https://pypi.org/project/pysteamauth/)
 [![Python: versions](
 https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue)]()
 
