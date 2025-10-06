@@ -4,7 +4,7 @@ from setuptools import setup
 requirements = [
     'aiohttp',
     'protobuf==5.28.2',
-    'pydantic==1.9',
+    'pydantic>=2',
     'rsa==4.7',
     'bitstring==3.1.2',
     'urllib3==2.2.2',

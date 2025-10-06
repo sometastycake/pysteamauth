@@ -303,7 +303,7 @@ class Steam:
             ),
             headers=headers,
         )
-        return FinalizeLoginStatus.parse_raw(response)
+        return FinalizeLoginStatus.model_validate_json(response)
 
     async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> None:
         await self._requests.request(
