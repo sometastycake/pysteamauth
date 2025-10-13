@@ -1,16 +1,14 @@
 import setuptools
 from setuptools import setup
 
-
 requirements = [
-    'aiohttp==3.10.2',
+    'aiohttp',
     'protobuf==5.28.2',
-    'pydantic==1.9',
+    'pydantic>=2',
     'rsa==4.7',
     'bitstring==3.1.2',
     'urllib3==2.2.2',
 ]
-
 
 setup(
     name='pysteamauth',
@@ -26,6 +24,5 @@ setup(
     zip_safe=False,
     python_requires='>=3.9',
     install_requires=requirements,
-    setup_requires=requirements,
     include_package_data=True,
 )

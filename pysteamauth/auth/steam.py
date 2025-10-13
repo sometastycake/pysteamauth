@@ -53,6 +53,7 @@ class Steam:
         device_id: Optional[str] = None,
         cookie_storage: Optional[CookieStorageAbstract] = None,
         request_strategy: Optional[RequestStrategyAbstract] = None,
+        proxy: Optional[str] = None,
     ):
         self._login = login
         self._steamid = steamid
@@ -60,8 +61,9 @@ class Steam:
         self._shared_secret = shared_secret
         self._identity_secret = identity_secret
         self._device_id = device_id
-        self._requests = request_strategy if request_strategy is not None else BaseRequestStrategy()
+        self._requests = request_strategy if request_strategy is not None else BaseRequestStrategy(proxy)
         self._storage = cookie_storage if cookie_storage is not None else BaseCookieStorage()
+        self._proxy = proxy
 
     @property
     def steamid(self) -> int:
@@ -285,6 +287,10 @@ class Steam:
         return CAuthentication_PollAuthSessionStatus_Response.FromString(response)
 
     async def _finalize_login(self, refresh_token: str, sessionid: str) -> FinalizeLoginStatus:
+        headers = {
+            'Referer': 'https://steamcommunity.com/',
+            'Origin': 'https://steamcommunity.com'
+        }
         response = await self._requests.text(
             method='POST',
             url='https://login.steampowered.com/jwt/finalizelogin',
@@ -295,11 +301,9 @@ class Steam:
                     ('redir', 'https://steamcommunity.com/login/home/?goto='),
                 ],
             ),
-            headers={
-                'Origin': 'https://steamcommunity.com'
-            }
+            headers=headers,
         )
-        return FinalizeLoginStatus.parse_raw(response)
+        return FinalizeLoginStatus.model_validate_json(response)
 
     async def _set_token(self, url: str, nonce: str, auth: str, steamid: int) -> None:
         await self._requests.request(
